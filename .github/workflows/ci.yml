@@ -22,7 +22,7 @@ jobs:
 # A step is a single unit of work inside a job. Steps run sequentially.
       - name: Checkout code
 # Human-readable label for this step, shown in the GitHub Actions log.
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 # Checks out your repository's code into the runner so subsequent steps can access it.
 # @v6 pins to major version 6 for stability while still getting bug fixes.
 
@@ -54,7 +54,7 @@ jobs:
     steps:
       - name: Checkout code
 # Checks out the repo so JavaScript files and importmap configs are available.
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 # Pins to the v6 major version of the checkout action.
 
       - name: Set up Ruby
@@ -82,7 +82,7 @@ jobs:
     steps:
       - name: Checkout code
 # Brings the repo onto the runner.
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 # Uses checkout action v6.
 
       - name: Set up Ruby
@@ -136,7 +136,7 @@ jobs:
 
       - name: Checkout code
 # Brings the repository source code onto the runner.
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 # Uses checkout action v6.
 
       - name: Set up Ruby
@@ -179,7 +179,7 @@ jobs:
 
       - name: Checkout code
 # Fetches the repo source onto the runner.
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 # Uses checkout action v6.
 
       - name: Set up Ruby
