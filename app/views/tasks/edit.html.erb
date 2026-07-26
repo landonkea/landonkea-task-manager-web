@@ -1,12 +1,25 @@
+<%# content_for stores the string "Editing task" under the :title key %>
+<%# The layout file will place this in the browser's <title> tag %>
+<%# So the tab reads "Editing task | Task Manager Web" %>
 <% content_for :title, "Editing task" %>
 
+<%# <h1> displays the main heading "Editing task" in large text %>
+<%# This tells the user they are editing an existing task, not creating a new one %>
 <h1>Editing task</h1>
 
+<%# render "form" loads the _form.html.erb partial, which contains the form fields %>
+<%# task: @task passes the existing task object into the partial %>
+<%# @task is loaded in the TasksController#edit action via Task.find(params[:id]) %>
+<%# The form will be pre-filled with the task's current name and done status %>
 <%= render "form", task: @task %>
 
-<br>
-
-<div>
+<%# This div wraps the navigation links below the form %>
+<div class="nav-links">
+  <%# link_to creates a link to view this task's show page %>
+  <%# @task generates a URL like "/tasks/5" - Rails infers the path from the object %>
+  <%# The pipe | is just a visual separator between the two links %>
   <%= link_to "Show this task", @task %> |
+  <%# link_to creates a link back to the full tasks list %>
+  <%# tasks_path generates the URL "/tasks" (the index page) %>
   <%= link_to "Back to tasks", tasks_path %>
 </div>

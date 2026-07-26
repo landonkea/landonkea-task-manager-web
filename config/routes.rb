@@ -1,15 +1,27 @@
-Rails.application.routes.draw do
-  resources :tasks
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+# This file tells Rails which web pages (URLs) your app responds to.
+# Think of it like a phone directory: "when someone visits /tasks, show them this page."
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+# `Rails.application.routes.draw do` starts the block where you define all your URLs.
+# Everything between `do` and `end` is a route definition.
+Rails.application.routes.draw do
+  # `resources :tasks` automatically creates ALL the standard URLs for managing tasks:
+  #   GET    /tasks        -> list all tasks        (index action)
+  #   GET    /tasks/new    -> show a form for a new task (new action)
+  #   POST   /tasks        -> create a new task      (create action)
+  #   GET    /tasks/:id    -> show one specific task  (show action)
+  #   GET    /tasks/:id/edit -> show a form to edit  (edit action)
+  #   PATCH  /tasks/:id    -> update an existing task (update action)
+  #   DELETE /tasks/:id    -> delete a task           (destroy action)
+  # This one line saves you from writing 7 separate route definitions!
+  resources :tasks
+
+  # `get "up"` creates a URL at /up that checks if your app is healthy and running.
+  # It points to the built-in Rails health check controller at `rails/health#show`.
+  # `as: :rails_health_check` gives this route a shortcut name so you can use
+  # `rails_health_check_path` in code instead of hardcoding "/up".
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # `root` sets the homepage. When someone visits just "/", they see the tasks index page.
+  # This is the first page users see when they open your app in a browser.
+  root "tasks#index"
 end

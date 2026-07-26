@@ -1,72 +1,124 @@
+# CI stands for Continuous Integration — this workflow runs automated checks on every push/PR.
 name: CI
+# Names this workflow "CI" so it appears with that label in the GitHub Actions UI.
 
 on:
+# Defines when this workflow should trigger.
   pull_request:
+# Runs on every pull request (regardless of target branch) so broken code is caught before merging.
   push:
+# Also runs on direct pushes, but only to specific branches.
     branches: [ main ]
+# Limits push triggers to the "main" branch so feature-branch pushes don't waste CI minutes.
 
 jobs:
+# Groups the jobs (independent tasks) that make up this workflow. Each runs in its own runner VM.
   scan_ruby:
+# Job name: scans Ruby code for security issues. Other jobs run in parallel with this one.
     runs-on: ubuntu-latest
+# Runs this job on the latest Ubuntu runner provided by GitHub (free for public repos).
 
     steps:
+# A step is a single unit of work inside a job. Steps run sequentially.
       - name: Checkout code
+# Human-readable label for this step, shown in the GitHub Actions log.
         uses: actions/checkout@v6
+# Checks out your repository's code into the runner so subsequent steps can access it.
+# @v6 pins to major version 6 for stability while still getting bug fixes.
 
       - name: Set up Ruby
+# Installs the Ruby version specified in .ruby-version on the runner.
         uses: ruby/setup-ruby@v1
+# Uses the official Ruby setup action to install and configure Ruby.
         with:
+# Passes configuration options to the action.
           bundler-cache: true
+# Caches installed gems between runs to speed up subsequent CI executions.
 
       - name: Scan for common Rails security vulnerabilities using static analysis
+# Describes the Brakeman scan step in plain language.
         run: bin/brakeman --no-pager
-      
+# Runs Brakeman, a static analysis tool that finds security holes in Rails code without executing it.
+# --no-pager prevents it from trying to open an interactive terminal.
+
       - name: Scan for known security vulnerabilities in gems used
+# Describes the Bundler Audit step.
         run: bin/bundler-audit
-      
+# Runs bundler-audit, which checks your Gemfile.lock against a database of known gem vulnerabilities.
+
   scan_js:
+# Job name: scans JavaScript dependencies for known security issues.
     runs-on: ubuntu-latest
+# Runs on the latest Ubuntu runner.
 
     steps:
       - name: Checkout code
+# Checks out the repo so JavaScript files and importmap configs are available.
         uses: actions/checkout@v6
+# Pins to the v6 major version of the checkout action.
 
       - name: Set up Ruby
+# Ruby is still needed because importmap-audit is a Ruby-based tool.
         uses: ruby/setup-ruby@v1
+# Installs Ruby and caches gems.
         with:
           bundler-cache: true
+# Enables Bundler caching to skip redundant gem installs.
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
+# Explains what importmap audit checks — JS libs imported via importmap.
         run: bin/importmap audit
+# Runs the importmap audit command, which checks JS packages for known CVEs.
 
   lint:
+# Job name: enforces consistent code style across the project.
     runs-on: ubuntu-latest
+# Runs on the latest Ubuntu runner.
     env:
+# Sets environment variables for all steps in this job.
       RUBOCOP_CACHE_ROOT: tmp/rubocop
+# Tells RuboCop where to store its cache. Caching avoids re-analyzing unchanged files.
+
     steps:
       - name: Checkout code
+# Brings the repo onto the runner.
         uses: actions/checkout@v6
+# Uses checkout action v6.
 
       - name: Set up Ruby
+# Installs Ruby since RuboCop is a Ruby gem.
         uses: ruby/setup-ruby@v1
+# The official Ruby setup action.
         with:
           bundler-cache: true
+# Caches gems to speed up this job.
 
       - name: Prepare RuboCop cache
+# Restores a previously saved RuboCop analysis cache from GitHub's cache storage.
         uses: actions/cache@v4
+# The GitHub Actions cache action, pinned to v4.
         env:
           DEPENDENCIES_HASH: ${{ hashFiles('.ruby-version', '**/.rubocop.yml', '**/.rubocop_todo.yml', 'Gemfile.lock') }}
+# Creates a hash of all files that affect RuboCop's behavior. If none changed, the cache is valid.
         with:
           path: ${{ env.RUBOCOP_CACHE_ROOT }}
+# Tells the cache action which directory to save/restore.
           key: rubocop-${{ runner.os }}-${{ env.DEPENDENCIES_HASH }}-${{ github.ref_name == github.event.repository.default_branch && github.run_id || 'default' }}
+# The cache key is unique per OS, dependency hash, and run. Fresh keys ensure caches don't go stale.
           restore-keys: |
+# If an exact match isn't found, try these fallback prefixes.
             rubocop-${{ runner.os }}-${{ env.DEPENDENCIES_HASH }}-
+# Restores the most recent cache with matching OS and dependency hash.
 
       - name: Lint code for consistent style
+# Runs RuboCop to check for style violations.
         run: bin/rubocop -f github
+# Runs RuboCop with GitHub-formatted output so violations appear as inline annotations on PRs.
 
   test:
+# Job name: runs the unit and integration test suite.
     runs-on: ubuntu-latest
+# Runs on the latest Ubuntu runner.
 
     # services:
     #  redis:
@@ -74,27 +126,42 @@ jobs:
     #    ports:
     #      - 6379:6379
     #    options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+    # Commented-out Redis service definition. Would spin up a Redis container if the app needed one.
+
     steps:
       - name: Install packages
+# Installs system-level dependencies required by gems like libvips.
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
+# Updates apt and installs libvips (image processing library) without extras.
 
       - name: Checkout code
+# Brings the repository source code onto the runner.
         uses: actions/checkout@v6
+# Uses checkout action v6.
 
       - name: Set up Ruby
+# Installs the project's Ruby version for running tests.
         uses: ruby/setup-ruby@v1
+# The official Ruby setup action.
         with:
           bundler-cache: true
+# Caches gems between CI runs.
 
       - name: Run tests
+# Runs the test suite after preparing the test database.
         env:
           RAILS_ENV: test
+# Configures Rails to use the test environment (test database, no caching, etc.).
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
+          # Commented-out secrets that would be needed if the app used encrypted credentials or Redis.
         run: bin/rails db:test:prepare test
+# db:test:prepare sets up/migrates the test database, then `test` runs Minitest.
 
   system-test:
+# Job name: runs browser-based system tests (end-to-end with a real browser).
     runs-on: ubuntu-latest
+# Runs on the latest Ubuntu runner.
 
     # services:
     #  redis:
@@ -102,29 +169,48 @@ jobs:
     #    ports:
     #      - 6379:6379
     #    options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+    # Commented-out Redis service for system tests.
+
     steps:
       - name: Install packages
+# Installs system libraries needed by gems used during system testing.
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
+# Installs libvips so image-related features work during tests.
 
       - name: Checkout code
+# Fetches the repo source onto the runner.
         uses: actions/checkout@v6
+# Uses checkout action v6.
 
       - name: Set up Ruby
+# Installs Ruby for running system tests.
         uses: ruby/setup-ruby@v1
+# The official Ruby setup action.
         with:
           bundler-cache: true
+# Enables Bundler gem caching.
 
       - name: Run System Tests
+# Runs end-to-end tests that exercise the app in a real browser (via Capybara).
         env:
           RAILS_ENV: test
+# Sets the environment to test so the test database and settings are used.
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
+          # Commented-out secrets for when encrypted credentials or Redis are configured.
         run: bin/rails db:test:prepare test:system
+# Prepares the test database, then runs only system tests (browser-based).
 
       - name: Keep screenshots from failed system tests
+# Saves screenshots taken during failed system tests for debugging.
         uses: actions/upload-artifact@v4
+# Uses the upload-artifact action (v4) to save files as downloadable artifacts.
         if: failure()
+# Only runs this step if a previous step in the job failed.
         with:
           name: screenshots
+# Names the artifact "screenshots" for easy identification in the Actions UI.
           path: ${{ github.workspace }}/tmp/screenshots
+# Points to the directory where Capybara saves screenshots on test failure.
           if-no-files-found: ignore
+# Silently skips if no screenshots exist (i.e., no tests failed).

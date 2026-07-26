@@ -1,22 +1,45 @@
 {
+  <%# "name" is the display name of the app when installed as a Progressive Web App (PWA) %>
+  <%# This appears on the home screen, in the app launcher, and in the browser's install prompt %>
   "name": "TaskManagerWeb",
+  <%# "icons" is an array of app icons in different sizes and purposes %>
+  <%# Browsers pick the best icon based on the device and where it's being displayed %>
   "icons": [
     {
+      <%# "src" points to the icon image file - "/icon.png" means it's in the public/ folder %>
       "src": "/icon.png",
+      <%# "type" tells the browser what format the image is in so it can render it %>
       "type": "image/png",
+      <%# "sizes" tells the browser this icon is 512x512 pixels - used for high-resolution displays %>
       "sizes": "512x512"
     },
     {
+      <%# This is the same icon but with a different purpose %>
       "src": "/icon.png",
       "type": "image/png",
       "sizes": "512x512",
+      <%# "purpose": "maskable" means this icon can be automatically cropped into different shapes %>
+      <%# Android icons are often displayed inside circles or rounded squares %>
+      <%# A maskable icon ensures the important parts of the icon aren't cut off %>
       "purpose": "maskable"
     }
   ],
+  <%# "start_url" is the page that opens when the user launches the installed app %>
+  <%# "/" means it opens the home page (root route) of the application %>
   "start_url": "/",
+  <%# "display": "standalone" makes the app look like a native app - no browser URL bar or buttons %>
+  <%# It fills the whole screen like a regular phone app would %>
   "display": "standalone",
+  <%# "scope" defines which URLs belong to this PWA - "/" means all pages in the app %>
+  <%# If someone navigates outside this scope, they'd see the regular browser interface %>
   "scope": "/",
+  <%# "description" is a short explanation of the app, shown in app stores and install prompts %>
   "description": "TaskManagerWeb.",
+  <%# "theme_color" sets the color of the browser's address bar and system UI elements %>
+  <%# This should match your app's branding - here it's set to red %>
   "theme_color": "red",
+  <%# "background_color" is the background color shown while the app is loading %>
+  <%# It fills the screen before the first page renders to prevent a white flash %>
   "background_color": "red"
+<%# The closing brace ends the JSON object %>
 }

@@ -1,8 +1,24 @@
 #!/bin/bash -e
+# The line above is a "shebang" — it tells your computer to run this file using
+# bash (the shell). The -e flag means "exit immediately if any command fails."
+# This is a safety net so errors don't silently pass by.
 
-# If running the rails server then create or migrate existing database
+# This script is the Docker entrypoint — it runs every time a Docker container starts.
+# It checks if the container is about to run the Rails server, and if so,
+# prepares the database before starting the app.
+
+# This condition checks the last two arguments passed to the entrypoint script.
+# "${@: -2:1}" gets the second-to-last argument; "${@: -1:1}" gets the last argument.
+# It's looking for "./bin/rails server" — the command to start the Rails web server.
+# The == operator compares strings in bash.
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  # If we're starting the server, prepare the database first.
+  # "db:prepare" creates the database if missing and runs pending migrations.
+  # This ensures the database is always ready before the app starts.
   ./bin/rails db:prepare
 fi
 
+# "exec" replaces this shell script with whatever command was passed to the entrypoint.
+# This makes the Rails process the main process in the container (PID 1),
+# which allows it to receive signals like SIGTERM for graceful shutdown.
 exec "${@}"

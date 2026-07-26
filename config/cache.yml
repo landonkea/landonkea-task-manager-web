@@ -1,16 +1,39 @@
+# This file configures your application's caching system.
+# Caching stores the result of expensive operations (like database queries)
+# so the next request can reuse the result instead of recalculating it.
+
+# `default: &default` creates a YAML anchor (template) called "default"
+# with shared settings that all environments will inherit.
 default: &default
+  # `store_options:` is a hash of settings for the cache store.
   store_options:
     # Cap age of oldest cache entry to fulfill retention policies
     # max_age: <%= 60.days.to_i %>
+    # The commented-out line above would expire cache entries after 60 days.
+    # It's commented out because the max_size setting is used instead.
+
+    # `max_size: <%= 256.megabytes %>` limits the total cache size to 256 megabytes.
+    # Once the cache reaches this size, Rails will remove the oldest entries to make room.
+    # This prevents the cache from growing unbounded and consuming all your disk space.
     max_size: <%= 256.megabytes %>
+    # `namespace: <%= Rails.env %>` prefixes all cache keys with the environment name
+    # (like "development" or "production"). This prevents cache collisions between
+    # environments if they share the same cache store.
     namespace: <%= Rails.env %>
 
+# `development:` inherits all default cache settings.
 development:
   <<: *default
 
+# `test:` inherits all default cache settings.
 test:
   <<: *default
 
+# `production:` inherits default settings but uses a database-backed cache.
 production:
+  # `database: cache` tells the cache store to use the dedicated "cache" SQLite database
+  # defined in database.yml. This is more reliable than in-memory caching because
+  # the cache survives server restarts.
   database: cache
+  # Inherits max_size and namespace from the default settings.
   <<: *default

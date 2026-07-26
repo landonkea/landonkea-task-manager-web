@@ -1,1 +1,7 @@
+<%# yield inserts the plain text content from the specific mailer template %>
+<%# This is the text-only version of email layouts (no HTML) %>
+<%# When sending emails, Rails sends both HTML and plain text versions %>
+<%# Some email clients or users prefer plain text emails for accessibility and simplicity %>
+<%# This layout is as simple as possible because plain text emails have no formatting %>
+<%# The mailer templates themselves provide all the content - this just passes it through %>
 <%= yield %>

@@ -1,10 +1,35 @@
-<p style="color: green"><%= notice %></p>
+<%# This ERB block checks if a "notice" message exists (e.g., "Task was successfully updated") %>
+<%# .present? returns true if the variable has content - it's a safe way to check for existence %>
+<%# Flash messages appear after actions like create, update, or delete to give user feedback %>
+<% if notice.present? %>
+  <%# Outputs the notice inside a <p> tag with class "notice" for CSS styling %>
+  <%# The <%= notice %> tag inserts the actual message text (like "Task was successfully created.") %>
+  <p class="notice"><%= notice %></p>
+<% end %>
 
+<%# render @task renders the _task.html.erb partial, passing in the single @task object %>
+<%# @task is set in the TasksController#show action - it's the specific task being viewed %>
+<%# The partial displays the task's name and completion status in a styled card %>
 <%= render @task %>
 
-<div>
+<%# This div contains navigation links for the task being viewed %>
+<div class="task-links">
+  <%# link_to "Edit this task" creates a link to the edit form for this task %>
+  <%# edit_task_path(@task) generates a URL like "/tasks/3/edit" where 3 is the task's ID %>
+  <%# The pipe character | between links is just a visual separator in the HTML %>
   <%= link_to "Edit this task", edit_task_path(@task) %> |
+  <%# link_to "Back to tasks" creates a link that goes back to the tasks index page %>
+  <%# tasks_path generates the URL "/tasks" which shows the full list of tasks %>
   <%= link_to "Back to tasks", tasks_path %>
+</div>
 
-  <%= button_to "Destroy this task", @task, method: :delete %>
+<%# This div wraps the delete button, with inline style adding space above it %>
+<%# margin-top: 1rem adds 1 rem (about 16px) of space above the button %>
+<div style="margin-top: 1rem;">
+  <%# button_to creates an HTML form with a submit button (not just a link) %>
+  <%# This is important because delete requires a POST/DELETE HTTP request, not a GET %>
+  <%# method: :delete tells Rails to send an HTTP DELETE request, which triggers the destroy action %>
+  <%# @task tells Rails to generate the URL /tasks/:id automatically %>
+  <%# class: "btn btn-danger" applies Bootstrap CSS to make it a red danger-styled button %>
+  <%= button_to "Destroy this task", @task, method: :delete, class: "btn btn-danger" %>
 </div>

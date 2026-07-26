@@ -1,17 +1,34 @@
+# This file configures Kamal, Rails' deployment tool.
+# Kamal uses Docker containers to deploy your app to a remote server.
+# It handles building Docker images, pushing them to a registry, and running them on your server.
+
 # Name of your application. Used to uniquely configure containers.
+
+# `service: task_manager_web` is the unique name for your app across Kamal.
+# It's used to name containers, volumes, and other Docker resources.
 service: task_manager_web
 
 # Name of the container image (use your-user/app-name on external registries).
+
+# `image: task_manager_web` is the name of the Docker image that gets built.
+# This is what Docker Hub (or your registry) will call the image file.
 image: task_manager_web
 
 # Deploy to these servers.
+
+# `servers:` lists the remote servers where your app will run.
 servers:
+  # `web:` defines the web server(s) that handle HTTP requests.
   web:
+    # `- 192.168.0.1` is the IP address of your production server.
+    # Kamal will SSH into this server to deploy and manage your app.
     - 192.168.0.1
   # job:
   #   hosts:
   #     - 192.168.0.1
   #   cmd: bin/jobs
+  # The commented-out section above defines a separate server for background jobs.
+  # `cmd: bin/jobs` tells Kamal to run the job processor command on that server.
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
 # If used with Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
@@ -23,61 +40,107 @@ servers:
 # proxy:
 #   ssl: true
 #   host: app.example.com
+# The commented-out section above configures an SSL reverse proxy using Kamal's built-in proxy.
+# It automatically sets up HTTPS with Let's Encrypt certificates.
 
 # Where you keep your container images.
+
+# `registry:` tells Kamal where to store your Docker images.
 registry:
   # Alternatives: hub.docker.com / registry.digitalocean.com / ghcr.io / ...
+  # `server: localhost:5555` points to a local Docker registry running on port 5555.
+  # For production, you'd change this to a remote registry like Docker Hub or GHCR.
   server: localhost:5555
 
   # Needed for authenticated registries.
   # username: your-user
+  # `username` is required for private registries. Commented out for local registry.
 
   # Always use an access token rather than real password when possible.
   # password:
   #   - KAMAL_REGISTRY_PASSWORD
+  # `password` reads from the KAMAL_REGISTRY_PASSWORD environment variable.
+  # Never hardcode passwords in this file!
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
+
+# `env:` sets environment variables inside your Docker container.
 env:
+  # `secret:` lists environment variables that come from the `.kamal/secrets` file.
+  # These are sensitive values (like keys and passwords) that shouldn't be in this file.
   secret:
+    # `RAILS_MASTER_KEY` is the key used to decrypt Rails credentials (encrypted secrets).
+    # Without it, your app can't access its secret configuration.
     - RAILS_MASTER_KEY
+  # `clear:` lists non-secret environment variables that are safe to have in this file.
   clear:
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
+
+    # `SOLID_QUEUE_IN_PUMA: true` runs background job processing inside the web server.
+    # This is convenient for small apps but should be separated on larger deployments.
     SOLID_QUEUE_IN_PUMA: true
 
     # Set number of processes dedicated to Solid Queue (default: 1)
+    # `JOB_CONCURRENCY: 3` would run 3 job worker processes. Commented out to use default of 1.
     # JOB_CONCURRENCY: 3
 
     # Set number of cores available to the application on each server (default: 1).
+    # `WEB_CONCURRENCY: 2` would run 2 Puma worker processes for handling web requests.
     # WEB_CONCURRENCY: 2
 
     # Match this to any external database server to configure Active Record correctly
     # Use task_manager_web-db for a db accessory server on same machine via local kamal docker network.
+
+    # `DB_HOST: 192.168.0.2` would point your app to a separate database server.
+    # Commented out because the default SQLite setup uses a local file.
     # DB_HOST: 192.168.0.2
 
     # Log everything from Rails
+    # `RAILS_LOG_LEVEL: debug` would set verbose logging. Commented out to use default "info".
     # RAILS_LOG_LEVEL: debug
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
+
+# `aliases:` define short commands for common deployment tasks.
 aliases:
+  # `console` opens a Rails console on the production server (like `bin/rails console` but remote).
+  # `--interactive` lets you type commands, `--reuse` reuses an existing container.
   console: app exec --interactive --reuse "bin/rails console"
+  # `shell` opens a regular bash shell on the production server for debugging.
   shell: app exec --interactive --reuse "bash"
+  # `logs` streams (tails) the app's log output in real-time, like `tail -f` but for Docker.
   logs: app logs -f
+  # `dbc` opens the database console (like sqlite3 or mysql client) on the production server.
   dbc: app exec --interactive --reuse "bin/rails dbconsole --include-password"
 
 # Use a persistent storage volume for sqlite database files and local Active Storage files.
 # Recommended to change this to a mounted volume path that is backed up off server.
+
+# `volumes:` maps a persistent Docker volume to a folder inside your container.
+# `task_manager_web_storage:/rails/storage` means Docker creates a named volume called
+# "task_manager_web_storage" and mounts it at `/rails/storage` inside the container.
+# This keeps your database and uploaded files safe even when the container is replaced.
 volumes:
   - "task_manager_web_storage:/rails/storage"
 
 # Bridge fingerprinted assets, like JS and CSS, between versions to avoid
 # hitting 404 on in-flight requests. Combines all files from new and old
 # version inside the asset_path.
+
+# `asset_path: /rails/public/assets` tells Kamal where your compiled assets live.
+# During deploys, Kamal serves BOTH old and new assets from this path so users
+# don't get 404 errors when their browser requests an asset from the old version
+# while the new version is being deployed.
 asset_path: /rails/public/assets
 
 # Configure the image builder.
+
+# `builder:` settings control how the Docker image is built.
 builder:
+  # `arch: amd64` builds the Docker image for the AMD64 (Intel/AMD) architecture.
+  # Use `arm64` for Apple Silicon Macs or AWS Graviton servers.
   arch: amd64
 
   # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
@@ -89,10 +152,14 @@ builder:
   # secrets:
   #   - GITHUB_TOKEN
   #   - RAILS_MASTER_KEY
+  # The commented-out section above would use a remote server to build Docker images.
+  # This is useful when your local machine has a different CPU architecture than the server.
 
 # Use a different ssh user than root
 # ssh:
 #   user: app
+# The commented-out line above would SSH into your server as the "app" user instead of root.
+# Using a non-root user is a security best practice.
 
 # Use accessory services (secrets come from .kamal/secrets).
 # accessories:
@@ -117,3 +184,5 @@ builder:
 #     port: 6379
 #     directories:
 #       - data:/data
+# The commented-out section above defines accessory services (like MySQL and Redis)
+# that run alongside your app. Accessories are for supporting services that your app depends on.

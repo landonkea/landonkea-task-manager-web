@@ -1,12 +1,21 @@
+<%# dom_id is a Rails helper that generates a unique HTML id attribute for the task object %>
+<%# For a task with id=3, it produces "task_3" - this follows Rails' DOM naming convention %>
+<%# The id attribute lets JavaScript and CSS target this specific element %>
 <div id="<%= dom_id task %>">
-  <div>
-    <strong>Name:</strong>
-    <%= task.name %>
+  <%# This div is styled as a "card" using the "task-card" CSS class %>
+  <%# A card is a common UI pattern - a contained box with the task's information %>
+  <div class="task-card">
+    <%# This div displays the task's name, styled with the "task-name" CSS class %>
+    <%# task.name reads the "name" attribute from the Task model/database record %>
+    <div class="task-name"><%= task.name %></div>
+    <%# This div shows the task's status and gets different CSS classes based on completion %>
+    <%# task.done? is a boolean method on the Task model that returns true or false %>
+    <%# The ternary operator (?) checks: if done is true, use class "completed", otherwise "pending" %>
+    <%# This lets CSS style completed and pending tasks differently (e.g., green vs. yellow) %>
+    <div class="task-status <%= task.done? ? 'completed' : 'pending' %>">
+      <%# Same ternary logic: if done is true, display "Completed", otherwise display "Pending" %>
+      <%# This is the text the user sees to know whether the task is finished or not %>
+      <%= task.done? ? "Completed" : "Pending" %>
+    </div>
   </div>
-
-  <div>
-    <strong>Done:</strong>
-    <%= task.done %>
-  </div>
-
 </div>

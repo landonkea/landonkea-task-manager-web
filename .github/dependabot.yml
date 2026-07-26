@@ -1,12 +1,22 @@
+# Dependabot version 2 is the current generation of GitHub's dependency update bot.
 version: 2
+# Tells Dependabot which ecosystems and directories to monitor for outdated dependencies.
 updates:
+# First update rule: manages Ruby gems via Bundler.
 - package-ecosystem: bundler
+# Monitors the Gemfile and Gemfile.lock in the repository root.
   directory: "/"
+# Checks for new gem versions every week.
   schedule:
     interval: weekly
+# Limits Dependabot to 10 open PRs at a time so it doesn't flood your repo with PRs.
   open-pull-requests-limit: 10
+# Second update rule: manages GitHub Actions used in workflow files.
 - package-ecosystem: github-actions
+# Scans .github/workflows/ for action references that have newer versions available.
   directory: "/"
+# Also checks weekly for action version updates.
   schedule:
     interval: weekly
+# Caps open PRs for actions at 10 as well.
   open-pull-requests-limit: 10

@@ -1,10 +1,392 @@
-/*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
- */
+/* This is a CSS reset that applies to all elements on the page */
+/* It ensures consistent spacing and sizing across different browsers */
+*,
+*::before,
+*::after {
+  /* Use border-box to include padding and border in the element's total width and height */
+  /* This makes layout calculations much simpler */
+  box-sizing: border-box;
+  
+  /* Remove default margins from all elements so we have full control over spacing */
+  margin: 0;
+  
+  /* Remove default padding from all elements for consistent spacing */
+  padding: 0;
+}
+
+/* Style the body element, which is the main container for all visible content */
+body {
+  /* Use the system font stack for a clean, native look on each operating system */
+  /* Falls back to sans-serif if none of the specified fonts are available */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  
+  /* Set a comfortable line height for readability - 1.6 times the font size */
+  line-height: 1.6;
+  
+  /* Set dark text color for good contrast against the light background */
+  color: #1a1a2e;
+  
+  /* Light gray background color for the entire page */
+  background-color: #f0f2f5;
+  
+  /* Add padding around the entire body to create space from the screen edges */
+  padding: 2rem;
+  
+  /* Limit the maximum width of the content to 800px for readability on large screens */
+  max-width: 800px;
+  
+  /* Center the body horizontally on the page using automatic margins */
+  margin: 0 auto;
+}
+
+/* Style the main heading (h1) for page titles */
+h1 {
+  /* Set a larger font size for the main heading */
+  font-size: 1.8rem;
+  
+  /* Add space below the heading to separate it from content below */
+  margin-bottom: 1rem;
+  
+  /* Use a slightly darker color than the body text for emphasis */
+  color: #16213e;
+}
+
+/* Style for success/notification messages (like "Task created successfully") */
+.notice {
+  /* Light green background to indicate success */
+  background-color: #d4edda;
+  
+  /* Dark green text for good contrast */
+  color: #155724;
+  
+  /* Add padding inside the notice box for spacing */
+  padding: 0.75rem 1rem;
+  
+  /* Round the corners of the notice box */
+  border-radius: 6px;
+  
+  /* Add space below the notice to separate it from other content */
+  margin-bottom: 1rem;
+  
+  /* Add a slightly darker green border around the notice */
+  border: 1px solid #c3e6cb;
+}
+
+/* Style for error/alert messages (like "Task could not be saved") */
+.alert {
+  /* Light red/pink background to indicate an error */
+  background-color: #f8d7da;
+  
+  /* Dark red text for good contrast */
+  color: #721c24;
+  
+  /* Add padding inside the alert box for spacing */
+  padding: 0.75rem 1rem;
+  
+  /* Round the corners of the alert box */
+  border-radius: 6px;
+  
+  /* Add space below the alert to separate it from other content */
+  margin-bottom: 1rem;
+  
+  /* Add a slightly darker red border around the alert */
+  border: 1px solid #f5c6cb;
+}
+
+/* Style the container that holds all task items */
+#tasks {
+  /* Add space below the tasks container */
+  margin-bottom: 1.5rem;
+}
+
+/* Style individual task cards to make them look like physical cards */
+.task-card {
+  /* White background for each task card */
+  background: #fff;
+  
+  /* Light gray border around each card */
+  border: 1px solid #e1e4e8;
+  
+  /* Round the corners of the card */
+  border-radius: 8px;
+  
+  /* Add padding inside the card for content spacing */
+  padding: 1rem 1.25rem;
+  
+  /* Add space between task cards */
+  margin-bottom: 0.75rem;
+  
+  /* Smooth transition when hovering - makes the shadow effect animated */
+  transition: box-shadow 0.2s ease;
+}
+
+/* Add a subtle shadow effect when hovering over a task card */
+.task-card:hover {
+  /* Create a soft shadow below the card to make it appear raised */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Style the task name/title text */
+.task-name {
+  /* Slightly larger than normal text for emphasis */
+  font-size: 1.1rem;
+  
+  /* Medium font weight to make the name stand out */
+  font-weight: 500;
+  
+  /* Small space below the name to separate it from the status */
+  margin-bottom: 0.25rem;
+}
+
+/* Style the task status text (like "Completed" or "Pending") */
+.task-status {
+  /* Smaller font size since it's secondary information */
+  font-size: 0.85rem;
+  
+  /* Gray color for less emphasis than the task name */
+  color: #6c757d;
+}
+
+/* Specific style for tasks marked as completed */
+.task-status.completed {
+  /* Green color to visually indicate completion */
+  color: #28a745;
+}
+
+/* Specific style for tasks that are still pending */
+.task-status.pending {
+  /* Yellow/amber color to visually indicate pending status */
+  color: #ffc107;
+}
+
+/* Style the container for task action links (Edit, Delete, etc.) */
+.task-links {
+  /* Use flexbox layout to arrange links in a row */
+  display: flex;
+  
+  /* Add space between the links */
+  gap: 0.5rem;
+  
+  /* Add space above the links to separate them from the task content */
+  margin-top: 0.5rem;
+}
+
+/* Style all links (a elements) throughout the application */
+a {
+  /* Blue color for links to make them stand out */
+  color: #0366d6;
+  
+  /* Remove default underline from links for cleaner appearance */
+  text-decoration: none;
+}
+
+/* Add underline to links when hovering to indicate they're clickable */
+a:hover {
+  /* Underline appears on hover to provide visual feedback */
+  text-decoration: underline;
+}
+
+/* Base style for all buttons */
+.btn {
+  /* Make buttons inline-block so they respect padding and margins */
+  display: inline-block;
+  
+  /* Add padding inside buttons for comfortable clicking */
+  padding: 0.5rem 1rem;
+  
+  /* Round the corners of buttons */
+  border-radius: 6px;
+  
+  /* Slightly smaller font size than body text */
+  font-size: 0.9rem;
+  
+  /* Medium font weight for button text */
+  font-weight: 500;
+  
+  /* Remove underline from buttons that might be links */
+  text-decoration: none;
+  
+  /* Change cursor to pointer when hovering over buttons */
+  cursor: pointer;
+  
+  /* Remove default border from buttons */
+  border: none;
+  
+  /* Smooth transition when button color changes on hover */
+  transition: background-color 0.2s ease;
+}
+
+/* Style for primary action buttons (like "Create Task") */
+.btn-primary {
+  /* Blue background color to indicate primary action */
+  background-color: #0366d6;
+  
+  /* White text for good contrast against blue background */
+  color: #fff;
+}
+
+/* Darker blue when hovering over primary buttons */
+.btn-primary:hover {
+  /* Slightly darker blue for hover effect */
+  background-color: #024ea2;
+  
+  /* Ensure no underline appears on hover */
+  text-decoration: none;
+}
+
+/* Style for destructive action buttons (like "Delete Task") */
+.btn-danger {
+  /* Red background color to indicate destructive action */
+  background-color: #dc3545;
+  
+  /* White text for good contrast against red background */
+  color: #fff;
+}
+
+/* Darker red when hovering over danger buttons */
+.btn-danger:hover {
+  /* Slightly darker red for hover effect */
+  background-color: #c82333;
+  
+  /* Ensure no underline appears on hover */
+  text-decoration: none;
+}
+
+/* Style for secondary/neutral buttons (like "Cancel") */
+.btn-secondary {
+  /* Gray background color for less emphasis */
+  background-color: #6c757d;
+  
+  /* White text for good contrast against gray background */
+  color: #fff;
+}
+
+/* Darker gray when hovering over secondary buttons */
+.btn-secondary:hover {
+  /* Slightly darker gray for hover effect */
+  background-color: #5a6268;
+  
+  /* Ensure no underline appears on hover */
+  text-decoration: none;
+}
+
+/* Style for the "New Task" link container */
+.new-task-link {
+  /* Add space above the link to separate it from other content */
+  margin-top: 1rem;
+}
+
+/* Style for form groups (each form field container) */
+.form-group {
+  /* Add space below each form group for vertical spacing */
+  margin-bottom: 1rem;
+}
+
+/* Style for form labels (the text above each input field) */
+.form-group label {
+  /* Make labels block elements so they appear on their own line */
+  display: block;
+  
+  /* Medium font weight for labels */
+  font-weight: 500;
+  
+  /* Small space below the label to separate it from the input field */
+  margin-bottom: 0.25rem;
+}
+
+/* Style for text, email, and textarea input fields */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group textarea {
+  /* Make inputs take full width of their container */
+  width: 100%;
+  
+  /* Add padding inside inputs for comfortable typing */
+  padding: 0.5rem 0.75rem;
+  
+  /* Light gray border around inputs */
+  border: 1px solid #d1d5da;
+  
+  /* Round the corners of inputs */
+  border-radius: 6px;
+  
+  /* Set input text size to match body text */
+  font-size: 1rem;
+}
+
+/* Style for when input fields are focused (clicked on) */
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group textarea:focus {
+  /* Remove the default browser outline */
+  outline: none;
+  
+  /* Change border color to blue to indicate focus */
+  border-color: #0366d6;
+  
+  /* Add a subtle blue glow around the focused input */
+  box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.15);
+}
+
+/* Style for checkbox inputs */
+.form-group input[type="checkbox"] {
+  /* Add space to the right of the checkbox to separate it from its label */
+  margin-right: 0.5rem;
+}
+
+/* Style for the form actions container (buttons at the bottom of forms) */
+.form-actions {
+  /* Add extra space above the form actions to separate them from form fields */
+  margin-top: 1.5rem;
+}
+
+/* Style for error message containers (when form validation fails) */
+.error-messages {
+  /* Light red background to indicate errors */
+  background-color: #f8d7da;
+  
+  /* Dark red text for good contrast */
+  color: #721c24;
+  
+  /* Add padding inside the error container */
+  padding: 1rem;
+  
+  /* Round the corners of the error container */
+  border-radius: 6px;
+  
+  /* Add space below the error messages */
+  margin-bottom: 1rem;
+  
+  /* Add a slightly darker red border */
+  border: 1px solid #f5c6cb;
+}
+
+/* Style for the error messages heading (like "2 errors prohibited this task from being saved:") */
+.error-messages h2 {
+  /* Smaller font size for the error heading */
+  font-size: 1rem;
+  
+  /* Add space below the heading to separate it from the error list */
+  margin-bottom: 0.5rem;
+}
+
+/* Style for the list of error messages */
+.error-messages ul {
+  /* Remove default margin from the list */
+  margin: 0;
+  
+  /* Add left padding to indent the list items */
+  padding-left: 1.25rem;
+}
+
+/* Style for navigation links at the bottom of pages */
+.nav-links {
+  /* Add space above the navigation links */
+  margin-top: 1.5rem;
+  
+  /* Add padding above the border */
+  padding-top: 1rem;
+  
+  /* Add a light gray border at the top to separate from content above */
+  border-top: 1px solid #e1e4e8;
+}

@@ -1,11 +1,21 @@
+<%# content_for stores the string "New task" under the :title key %>
+<%# This is later inserted into the <title> tag in the layout file %>
+<%# So the browser tab will show "New task | Task Manager Web" %>
 <% content_for :title, "New task" %>
 
+<%# <h1> is the main page heading - it displays "New task" in large text at the top %>
+<%# This tells the user they are on the page for creating a new task %>
 <h1>New task</h1>
 
+<%# render "form" renders the _form.html.erb partial file %>
+<%# task: @task passes the @task object (a new, empty Task) into the partial as a local variable %>
+<%# @task is built in the TasksController#new action with Task.new %>
+<%# The form partial contains all the form fields (name, done checkbox, submit button) %>
 <%= render "form", task: @task %>
 
-<br>
-
-<div>
+<%# This div wraps the navigation link below the form %>
+<div class="nav-links">
+  <%# link_to creates a link back to the tasks index page %>
+  <%# tasks_path generates the URL "/tasks" which shows all tasks %>
   <%= link_to "Back to tasks", tasks_path %>
 </div>

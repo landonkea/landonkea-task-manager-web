@@ -1,9 +1,22 @@
+# This file configures Active Storage, Rails' built-in file upload system.
+# Active Storage lets users upload files (images, documents, etc.) and stores them
+# either locally on disk or in cloud services like Amazon S3 or Google Cloud Storage.
+
+# `test:` configures file storage for the test environment.
 test:
+  # `service: Disk` means files are stored on the local hard drive (not in the cloud).
   service: Disk
+  # `root: <%= Rails.root.join("tmp/storage") %>` sets the folder where test files are saved.
+  # `tmp/storage` is a temporary folder that gets cleaned up between test runs,
+  # so test uploads don't accumulate.
   root: <%= Rails.root.join("tmp/storage") %>
 
+# `local:` configures file storage for local development and production.
 local:
+  # `service: Disk` stores files on the local hard drive.
   service: Disk
+  # `root: <%= Rails.root.join("storage") %>` saves files in the `storage/` folder.
+  # This folder persists between restarts, so uploaded files are kept safely.
   root: <%= Rails.root.join("storage") %>
 
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
@@ -13,6 +26,9 @@ local:
 #   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
 #   region: us-east-1
 #   bucket: your_own_bucket-<%= Rails.env %>
+# The commented-out section above shows how to configure Amazon S3 cloud storage.
+# You'd uncomment it and set your AWS credentials to store files in S3 instead of locally.
+# S3 is recommended for production apps with lots of uploads.
 
 # Remember not to checkin your GCS keyfile to a repository
 # google:
@@ -20,8 +36,13 @@ local:
 #   project: your_project
 #   credentials: <%= Rails.root.join("path/to/gcs.keyfile") %>
 #   bucket: your_own_bucket-<%= Rails.env %>
+# The commented-out section above shows how to configure Google Cloud Storage (GCS).
+# Similar to S3 but uses Google's cloud infrastructure.
 
 # mirror:
 #   service: Mirror
 #   primary: local
 #   mirrors: [ amazon, google, microsoft ]
+# The commented-out section above shows how to set up storage mirroring.
+# Mirroring uploads files to MULTIPLE storage services simultaneously for redundancy.
+# For example, files would be saved locally AND uploaded to S3 and GCS.

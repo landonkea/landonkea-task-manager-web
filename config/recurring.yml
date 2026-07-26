@@ -1,3 +1,6 @@
+# This file defines recurring (scheduled) background jobs.
+# These are tasks that run automatically on a schedule, like cleaning up old data every hour.
+
 # examples:
 #   periodic_cleanup:
 #     class: CleanSoftDeletedRecordsJob
@@ -8,8 +11,19 @@
 #     command: "SoftDeletedRecord.due.delete_all"
 #     priority: 2
 #     schedule: at 5am every day
+# The commented-out lines above are examples showing how to define recurring jobs.
+# They demonstrate two approaches: running a job class, or running a direct command.
 
+# `production:` configures recurring jobs that only run in production.
 production:
+  # `clear_solid_queue_finished_jobs:` is the name of this scheduled job.
   clear_solid_queue_finished_jobs:
+    # `command:` is a Ruby code string that Solid Queue will execute on the schedule.
+    # This particular command cleans up finished jobs from the Solid Queue database
+    # to prevent it from growing forever. It processes them in batches, sleeping 0.3
+    # seconds between batches to avoid overloading the database.
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    # `schedule: every hour at minute 12` runs this cleanup once per hour, specifically
+    # at the 12th minute of each hour (12:12, 1:12, 2:12, etc.).
+    # Staggering the time avoids all jobs running at exactly :00.
     schedule: every hour at minute 12

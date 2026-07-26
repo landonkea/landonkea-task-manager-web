@@ -1,4 +1,8 @@
 # Omakase Ruby styling for Rails
+
+# "inherit_gem" means "load the default rules from this gem and use them as a starting point."
+# rubocop-rails-omakase provides Rails' recommended Ruby style rules (indentation, naming, etc.).
+# rubocop.yml is the specific config file inside that gem to load.
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
 # Overwrite or add rules to create your own house style
@@ -6,3 +10,5 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
 # Layout/SpaceInsideArrayLiteralBrackets:
 #   Enabled: false
+# The lines above are commented out examples showing how you could customize the style.
+# You can uncomment and modify them to override the inherited rules for your team.

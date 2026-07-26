@@ -1,27 +1,61 @@
+<%# form_with creates an HTML <form> element that knows how to talk to a Rails controller %>
+<%# model: task tells the form which object to work with - it auto-generates the form's action URL %>
+<%# If task is new, it posts to /tasks (create). If task exists, it patches to /tasks/:id (update) %>
+<%# The |form| variable gives us helper methods to generate form fields %>
 <%= form_with(model: task) do |form| %>
+  <%# task.errors.any? checks if the task has any validation errors %>
+  <%# This happens when the user submits the form but something is wrong (e.g., name is blank) %>
+  <%# Rails automatically populates errors after a failed save attempt in the controller %>
   <% if task.errors.any? %>
-    <div style="color: red">
+    <%# This div wraps all the error messages, styled with CSS class "error-messages" %>
+    <div class="error-messages">
+      <%# pluralize is a Rails helper that returns "1 error" or "2 errors" etc. %>
+      <%# task.errors.count gives the number of errors %>
+      <%# This heading tells the user how many problems need fixing %>
       <h2><%= pluralize(task.errors.count, "error") %> prohibited this task from being saved:</h2>
 
+      <%# <ul> is an HTML unordered list - it will show each error as a bullet point %>
       <ul>
+        <%# task.errors.each iterates over every validation error on the task object %>
+        <%# |error| is a local variable holding the current error in each loop iteration %>
         <% task.errors.each do |error| %>
+          <%# error.full_message returns a readable error like "Name can't be blank" %>
+          <%# Each error is displayed as a list item <li> so they appear as a bulleted list %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
+  <%# This div groups the "name" label and input together for styling with CSS %>
+  <div class="form-group">
+    <%# form.label :name creates an HTML <label> tag that says "Name" %>
+    <%# Labels are important for accessibility - screen readers use them to describe inputs %>
+    <%= form.label :name %>
+    <%# form.text_field :name creates an <input type="text"> HTML element %>
+    <%# It automatically sets the input's name to "task[name]" so Rails knows which attribute to update %>
+    <%# placeholder shows gray hint text inside the input when it's empty %>
+    <%= form.text_field :name, placeholder: "Enter task name..." %>
   </div>
 
-  <div>
-    <%= form.label :done, style: "display: block" %>
+  <%# This div groups the "done" checkbox and its label together %>
+  <div class="form-group">
+    <%# form.label :done creates a label that says "Done" %>
+    <%= form.label :done %>
+    <%# form.checkbox :done creates an HTML <input type="checkbox"> %>
+    <%# It sends a boolean (true/false) value for the "done" attribute to the controller %>
     <%= form.checkbox :done %>
+    <%# This is plain HTML text shown next to the checkbox as a visual hint for the user %>
+    Mark as completed
   </div>
 
-  <div>
-    <%= form.submit %>
+  <%# This div wraps the submit button for layout/styling purposes %>
+  <div class="form-actions">
+    <%# form.submit creates a <button type="submit"> that sends the form data to the server %>
+    <%# The button text is automatically "Create Task" for new tasks or "Update Task" for existing ones %>
+    <%# class: "btn btn-primary" applies Bootstrap styling to make it a blue button %>
+    <%= form.submit class: "btn btn-primary" %>
   </div>
+<%# end closes the form_with block %>
+<%# Everything between form_with and end is inside the <form> HTML element %>
 <% end %>

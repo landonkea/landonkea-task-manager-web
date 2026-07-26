@@ -1,9 +1,18 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# Fixtures are pre-made fake data records that Rails loads into your test database.
+# They let tests use consistent, predictable data without creating it from scratch.
+# Each fixture is identified by a label (like "one" or "two") and maps to columns in the tasks table.
 
+# This defines the first sample task, referenced as tasks(:one) in tests.
+# It has a name of "Buy groceries" and is marked as not done (false).
+# Tests use this as a starting point for things like editing, viewing, or deleting tasks.
 one:
-  name: MyString
+  name: "Buy groceries"
   done: false
 
+# This defines the second sample task, referenced as tasks(:two) in tests.
+# It has a name of "Write documentation" and is marked as done (true).
+# Having both a done and not-done task lets tests check filtering logic,
+# like the completed and pending scopes in the Task model.
 two:
-  name: MyString
-  done: false
+  name: "Write documentation"
+  done: true

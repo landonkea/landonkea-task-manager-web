@@ -1,16 +1,45 @@
-<p style="color: green"><%= notice %></p>
+<%# This ERB block checks if a "notice" message exists (e.g., "Task was successfully created") %>
+<%# The .present? method returns true if the notice variable is not nil and not empty %>
+<%# We use this to conditionally show a success/flash message to the user %>
+<% if notice.present? %>
+  <%# This outputs an HTML <p> tag with the CSS class "notice" for styling %>
+  <%# <%= notice %> is an ERB output tag that inserts the notice message text into the HTML %>
+  <%# This is how Rails displays "flash messages" - temporary alerts after actions like creating or deleting %>
+  <p class="notice"><%= notice %></p>
+<% end %>
 
+<%# content_for stores a piece of content under the :title key %>
+<%# This is later inserted into the <title> tag in the application layout %>
+<%# Here we set the page title to "Tasks" so the browser tab shows "Tasks | Task Manager Web" %>
 <% content_for :title, "Tasks" %>
 
+<%# <h1> is the main heading of the page, shown at the top in large text %>
+<%# This tells the user they are on the Tasks list page %>
 <h1>Tasks</h1>
 
+<%# A <div> with id="tasks" wraps all task items - the id helps with CSS styling and JavaScript targeting %>
 <div id="tasks">
+  <%# @tasks is an instance variable set in the TasksController#index action %>
+  <%# It contains all Task records from the database %>
+  <%# .each iterates over every task, and |task| is a local variable holding the current task in each loop %>
   <% @tasks.each do |task| %>
+    <%# render task looks for a partial file _task.html.erb and renders it once for each task %>
+    <%# This is Rails' convention: the _task.html.erb partial displays a single task's details %>
     <%= render task %>
-    <p>
+    <%# This div wraps the navigation links for each individual task %>
+    <div class="task-links">
+      <%# link_to creates an HTML <a> tag (a clickable link) %>
+      <%# The first argument "Show this task" is the visible link text %>
+      <%# The second argument `task` is the URL - Rails automatically generates /tasks/:id from the task object %>
       <%= link_to "Show this task", task %>
-    </p>
+    </div>
   <% end %>
 </div>
 
-<%= link_to "New task", new_task_path %>
+<%# This div wraps the link to create a new task, styled as a button %>
+<div class="new-task-link">
+  <%# link_to creates a link styled as a Bootstrap button ("btn btn-primary") %>
+  <%# new_task_path is a Rails route helper that generates the URL "/tasks/new" %>
+  <%# This is where the user clicks to go to the form for creating a new task %>
+  <%= link_to "New task", new_task_path, class: "btn btn-primary" %>
+</div>

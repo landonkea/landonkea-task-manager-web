@@ -1,40 +1,85 @@
+# This file configures your database connection.
+# It tells Rails what type of database to use, where it lives, and how to connect.
+# Rails uses SQLite by default, which is a simple file-based database (no server needed).
+
 # SQLite. Versions 3.8.0 and up are supported.
 #   gem install sqlite3
 #
 #   Ensure the SQLite 3 gem is defined in your Gemfile
 #   gem "sqlite3"
 #
+
+# `default: &default` creates a YAML "anchor" called default.
+# Think of it as a template: any settings here will be copied into all environments below.
+# `&default` is the anchor name that other sections will reference.
 default: &default
+  # `adapter: sqlite3` tells Rails to use SQLite as the database engine.
+  # SQLite stores everything in a single file, making it perfect for small/medium apps.
   adapter: sqlite3
+  # `max_connections` sets how many simultaneous database connections Rails can make.
+  # It reads from the RAILS_MAX_THREADS environment variable, defaulting to 5 if not set.
+  # This should match or exceed the number of threads in your web server (see puma.rb).
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  # `timeout: 5000` waits up to 5000 milliseconds (5 seconds) for a database connection
+  # before giving up. This prevents your app from hanging forever if the database is busy.
   timeout: 5000
 
+# `development:` configures the database used when you're building your app locally.
 development:
+  # `<<: *default` is YAML merge syntax. It copies ALL the settings from the default
+  # section above into this section. So development inherits adapter, max_connections, and timeout.
   <<: *default
+  # `database: storage/development.sqlite3` is the file path where your dev database lives.
+  # The file is stored in the `storage/` folder at your project root.
   database: storage/development.sqlite3
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
+
+# `test:` configures the database for your automated test suite.
 test:
+  # Inherits all default settings (adapter, connections, timeout).
   <<: *default
+  # `database: storage/test.sqlite3` stores the test database in a separate file.
+  # This database gets wiped and recreated every time you run tests, so your tests
+  # always start with a clean slate and don't interfere with your development data.
   database: storage/test.sqlite3
 
 # Store production database in the storage/ directory, which by default
 # is mounted as a persistent Docker volume in config/deploy.yml.
+
+# `production:` configures databases for your live, real-users environment.
+# Production uses MULTIPLE separate databases (a "multi-database" setup) for performance.
 production:
+  # `primary:` is your main database -- stores tasks, users, and your app's core data.
   primary:
+    # Inherits default SQLite settings.
     <<: *default
+    # Stores the primary production database in `storage/production.sqlite3`.
     database: storage/production.sqlite3
+  # `cache:` is a separate database just for caching data.
+  # Separating it keeps cache operations from slowing down your main database.
   cache:
     <<: *default
+    # `database: storage/production_cache.sqlite3` -- a dedicated SQLite file for cache data.
     database: storage/production_cache.sqlite3
+    # `migrations_paths: db/cache_migrate` tells Rails where to find database migration files
+    # specific to the cache database. Migrations are scripts that create/modify database tables.
     migrations_paths: db/cache_migrate
+  # `queue:` is a separate database for background job queue data.
+  # Background jobs are tasks that run asynchronously (like sending emails).
   queue:
     <<: *default
+    # `database: storage/production_queue.sqlite3` -- dedicated SQLite file for job queue data.
     database: storage/production_queue.sqlite3
+    # Points to migrations that create the tables needed for the Solid Queue job system.
     migrations_paths: db/queue_migrate
+  # `cable:` is a separate database for Action Cable (real-time WebSocket) data.
+  # Action Cable powers live updates, like when a task changes and you see it instantly.
   cable:
     <<: *default
+    # `database: storage/production_cable.sqlite3` -- dedicated SQLite file for WebSocket data.
     database: storage/production_cable.sqlite3
+    # Points to migrations that create tables needed for Action Cable's persistence.
     migrations_paths: db/cable_migrate

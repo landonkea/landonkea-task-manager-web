@@ -1,29 +1,73 @@
+<%# DOCTYPE html tells the browser this is an HTML5 document - it must be the very first line %>
 <!DOCTYPE html>
+<%# <html> is the root element that wraps everything on the page %>
 <html>
+  <%# <head> contains metadata about the page - information not shown directly to the user %>
   <head>
+    <%# <title> sets the text shown in the browser tab %>
+    <%# content_for(:title) retrieves whatever title was set by a page using content_for :title %>
+    <%# The || operator means "or" - if no title was set, it defaults to "Task Manager Web" %>
+    <%# This way each page can set its own title, but there's always a fallback %>
     <title><%= content_for(:title) || "Task Manager Web" %></title>
+    <%# <meta> tags provide metadata to the browser %>
+    <%# viewport tells mobile browsers how to scale the page - width=device-width means use full screen width %>
+    <%# initial-scale=1 means don't zoom in or out when the page loads %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%# apple-mobile-web-app-capable tells iOS Safari this app can be added to the home screen %>
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <%# application-name sets the name that appears below the home screen icon on mobile %>
     <meta name="application-name" content="Task Manager Web">
+    <%# mobile-web-app-capable tells Android Chrome this app can run in standalone mode %>
     <meta name="mobile-web-app-capable" content="yes">
+    <%# csrf_meta_tags inserts hidden form fields with a security token %>
+    <%# CSRF (Cross-Site Request Forgery) protection prevents malicious sites from submitting forms on your behalf %>
+    <%# Rails automatically checks this token on every form submission %>
     <%= csrf_meta_tags %>
+    <%# csp_meta_tag inserts a Content Security Policy meta tag %>
+    <%# CSP tells the browser which URLs are allowed to load scripts, styles, and images %>
+    <%# This prevents cross-site scripting (XSS) attacks %>
     <%= csp_meta_tag %>
 
+    <%# yield :head inserts any content that individual pages have stored with content_for :head %>
+    <%# This lets pages add extra <head> elements (like extra stylesheets) when needed %>
     <%= yield :head %>
 
+    <%# This is an ERB comment explaining the PWA manifest link below it %>
+    <%# PWA (Progressive Web App) makes the app installable like a native app %>
+    <%# The manifest link is commented out - you'd uncomment it when enabling PWA features %>
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%# This line is commented out with <%#= which means it won't render anything %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
+    <%# <link rel="icon"> tells the browser which image to use as the tab icon (favicon) %>
+    <%# Different formats are provided so the browser can pick the best one %>
     <link rel="icon" href="/icon.png" type="image/png">
+    <%# The SVG version of the icon for browsers that support it (SVGs look sharper) %>
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <%# apple-touch-icon is the icon used when someone adds this app to their iPhone home screen %>
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <%# This ERB comment explains the stylesheet tag below %>
     <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%# stylesheet_link_tag :app generates <link> tags for all CSS files %>
+    <%# "data-turbo-track": "reload" tells Turbo to reload the page when CSS files change %>
+    <%# This ensures users always see the latest styles during development %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%# javascript_importmap_tags loads JavaScript files using Rails' importmap system %>
+    <%# Importmap lets you use JavaScript modules without a bundler like Webpack %>
+    <%# It reads config/importmap.rb to know which JS files to load %>
     <%= javascript_importmap_tags %>
+  <%# </head> closes the head section %>
   </head>
 
+  <%# <body> contains all the visible content of the page %>
   <body>
+    <%# yield inserts the content from each individual page template (like index.html.erb) %>
+    <%# When you visit /tasks, Rails renders index.html.erb and inserts it here %>
+    <%# This is how the layout wraps around every page - the layout provides the shell %>
+    <%# and each page template provides the body content %>
     <%= yield %>
+  <%# </body> closes the body section %>
   </body>
+<%# </html> closes the HTML document %>
 </html>

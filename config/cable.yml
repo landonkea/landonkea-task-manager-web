@@ -1,17 +1,40 @@
+# This file configures Action Cable, Rails' built-in real-time WebSocket system.
+# WebSockets let your server push live updates to the browser (like instant notifications)
+# instead of the browser having to constantly ask "any updates?" (polling).
+
 # Async adapter only works within the same process, so for manually triggering cable updates from a console,
 # and seeing results in the browser, you must do so from the web console (running inside the dev process),
 # not a terminal started via bin/rails console! Add "console" to any action or any ERB template view
 # to make the web console appear.
+
+# `development:` configures Action Cable for your local development environment.
 development:
+  # `adapter: async` uses an in-memory adapter that only works within a single process.
+  # This means WebSocket messages stay inside your running server -- perfect for development
+  # but wouldn't work across multiple servers in production. It's simple and requires no setup.
   adapter: async
 
+# `test:` configures Action Cable for your automated test suite.
 test:
+  # `adapter: test` is a fake adapter used during tests. It doesn't actually send messages
+  # over WebSockets -- instead it lets you test your cable code by checking what was broadcast.
   adapter: test
 
+# `production:` configures Action Cable for your live, real-users environment.
 production:
+  # `adapter: solid_cable` uses Solid Cable, which stores WebSocket data in a database.
+  # Unlike the async adapter, this works across multiple server processes and persists messages,
+  # so connections don't miss messages if they briefly disconnect.
   adapter: solid_cable
+  # `connects_to` tells Solid Cable which database to use.
   connects_to:
     database:
+      # `writing: cable` points to the "cable" database connection defined in database.yml.
+      # This is the dedicated SQLite database for Action Cable data.
       writing: cable
+  # `polling_interval: 0.1.seconds` checks for new messages every 0.1 seconds (100ms).
+  # Lower values mean faster real-time updates but more database reads.
   polling_interval: 0.1.seconds
+  # `message_retention: 1.day` keeps old WebSocket messages for 1 day.
+  # This lets clients that briefly disconnect rejoin and catch up on messages they missed.
   message_retention: 1.day

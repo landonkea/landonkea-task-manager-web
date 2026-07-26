@@ -1,9 +1,23 @@
 # See https://git-scm.com/docs/gitattributes for more about git attribute files.
 
 # Mark the database schema as having been generated.
+
+# "linguist-generated" tells GitHub that this file was auto-generated (by Rails migrations).
+# GitHub will hide it in pull request diffs and mark it with a "generated" label,
+# so reviewers know it doesn't need manual review.
 db/schema.rb linguist-generated
 
 # Mark any vendored files as having been vendored.
+
+# "linguist-vendored" tells GitHub that files in vendor/ are third-party code,
+# not written by your team. GitHub will exclude them from language statistics
+# and code review summaries.
 vendor/* linguist-vendored
+
+# "diff=rails_credentials" tells git to use a special diff driver for encrypted credentials.
+# This prevents git from showing decrypted secrets in diffs — it just shows
+# "changed" or "unchanged" instead, keeping secrets safe during code review.
 config/credentials/*.yml.enc diff=rails_credentials
+
+# Same as above, but for the main credentials file.
 config/credentials.yml.enc diff=rails_credentials

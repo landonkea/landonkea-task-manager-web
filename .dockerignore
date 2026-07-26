@@ -1,51 +1,119 @@
 # See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
 
+# The .dockerignore file tells Docker which files to EXCLUDE when building a Docker image.
+# This keeps your image small and prevents secrets or unnecessary files from being copied in.
+
 # Ignore git directory.
+
+# /.git/ contains all git history and is huge. It's not needed inside the Docker image.
 /.git/
+
+# /.gitignore is the git ignore file — not needed inside the Docker image.
 /.gitignore
 
 # Ignore bundler config.
+
+# /.bundle contains Bundler's local configuration and cached gems.
+# The image should do its own `bundle install`, so this isn't needed.
 /.bundle
 
 # Ignore all environment files.
+
+# /.env* matches any .env files that contain secrets and environment-specific config.
+# These should be provided at runtime via Docker environment variables, not baked into the image.
 /.env*
 
 # Ignore all default key files.
+
+# /config/master.key is the master key used to decrypt Rails credentials.
+# It should never be in a Docker image — it's a security risk.
 /config/master.key
+
+# /config/credentials/*.key are individual credential decryption keys.
+# Like the master key, these must never be in a Docker image.
 /config/credentials/*.key
 
 # Ignore all logfiles and tempfiles.
+
+# /log/* contains server logs that are created at runtime, not needed in the image.
 /log/*
+
+# /tmp/* contains temporary files created during normal operation.
 /tmp/*
+
+# !/log/.keep keeps the log directory tracked (the .keep placeholder).
 !/log/.keep
+
+# !/tmp/.keep keeps the tmp directory tracked (the .keep placeholder).
 !/tmp/.keep
 
 # Ignore pidfiles, but keep the directory.
+
+# /tmp/pids/* contains process ID files that are only relevant at runtime.
 /tmp/pids/*
+
+# !/tmp/pids/.keep keeps the pids directory tracked in the image.
 !/tmp/pids/.keep
 
 # Ignore storage (uploaded files in development and any SQLite databases).
+
+# /storage/* contains user uploads and SQLite databases from local development.
+# These shouldn't be in the image — they'll be different in production.
 /storage/*
+
+# !/storage/.keep keeps the storage directory tracked.
 !/storage/.keep
+
+# /tmp/storage/* contains temporary storage files.
 /tmp/storage/*
+
+# !/tmp/storage/.keep keeps the tmp/storage directory tracked.
 !/tmp/storage/.keep
 
 # Ignore assets.
+
+# /node_modules/ contains JavaScript dependencies (if using Node.js).
+# These should be installed fresh during the build, not copied in.
 /node_modules/
+
+# /app/assets/builds/* contains compiled CSS and JavaScript output.
+# These are generated files that should be rebuilt during the Docker build.
 /app/assets/builds/*
+
+# !/app/assets/builds/.keep keeps the builds directory tracked.
 !/app/assets/builds/.keep
+
+# /public/assets contains precompiled asset files.
+# These are generated and should be rebuilt during the Docker build.
 /public/assets
 
 # Ignore CI service files.
+
+# /.github contains GitHub Actions workflows and other CI configuration.
+# These files aren't needed inside the Docker image.
 /.github
 
 # Ignore Kamal files.
+
+# /config/deploy*.yml are Kamal deployment configuration files.
+# They define how to deploy but aren't needed inside the running app.
 /config/deploy*.yml
+
+# /.kamal contains Kamal's local cache and state files.
+# Not needed inside the Docker image.
 /.kamal
 
 # Ignore development files
+
+# /.devcontainer contains VS Code dev container configuration.
+# This is for local development only and shouldn't be in the Docker image.
 /.devcontainer
 
 # Ignore Docker-related files
+
+# /.dockerignore is this file itself — there's no reason to include it in the image.
 /.dockerignore
+
+# /Dockerfile* matches all Dockerfiles in the project.
+# The Dockerfile is only used to BUILD the image, not to run inside it.
 /Dockerfile*

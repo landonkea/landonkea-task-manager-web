@@ -1,13 +1,28 @@
+<%# DOCTYPE html tells the browser this is an HTML5 document %>
 <!DOCTYPE html>
+<%# <html> is the root element of the page %>
 <html>
+  <%# <head> contains metadata about the email %>
   <head>
+    <%# Content-Type with charset=utf-8 ensures special characters (accents, emojis) display correctly %>
+    <%# This is especially important for email clients which can be finicky about encoding %>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <%# <style> is where you would put CSS rules for the email %>
+    <%# Email HTML is very limited - most email clients require inline styles rather than stylesheets %>
+    <%# This is why the style block is empty - you'd add inline styles to elements directly %>
     <style>
       /* Email styles need to be inline */
     </style>
+  <%# </head> closes the head section %>
   </head>
 
+  <%# <body> contains the visible email content %>
   <body>
+    <%# yield inserts the content from the specific mailer view (e.g., welcome email body) %>
+    <%# Each mailer action has its own template, and this layout wraps around all of them %>
+    <%# This is the same pattern as the application layout - a shared wrapper with per-page content %>
     <%= yield %>
+  <%# </body> closes the body section %>
   </body>
+<%# </html> closes the HTML document %>
 </html>

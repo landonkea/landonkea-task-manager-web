@@ -5,31 +5,70 @@
 # `$XDG_CONFIG_HOME/git/ignore` or `~/.config/git/ignore`
 
 # Ignore bundler config.
+
+# /.bundle contains Bundler's configuration and cached gem data.
+# It's specific to your machine and shouldn't be shared with other developers.
 /.bundle
 
 # Ignore all environment files.
+
+# /.env* matches any file starting with ".env" (like .env, .env.local, .env.production).
+# These files contain secrets (API keys, passwords) that should never be committed.
 /.env*
 
 # Ignore all logfiles and tempfiles.
+
+# /log/* matches all files inside the log/ directory.
+# Log files contain server output and error messages that change constantly.
 /log/*
+
+# /tmp/* matches all files inside the tmp/ directory.
+# Temp files are created during normal app operation and aren't useful to others.
 /tmp/*
+
+# !/log/.keep and !/tmp/.keep are exceptions — the "!" prefix means "do NOT ignore."
+# These .keep files are empty placeholders that ensure git tracks the directories
+# themselves (git doesn't track empty directories by default).
 !/log/.keep
 !/tmp/.keep
 
 # Ignore pidfiles, but keep the directory.
+
+# /tmp/pids/* matches process ID files created by Puma (the web server).
+# These files track running processes and become stale when the server stops.
 /tmp/pids/*
+
+# !/tmp/pids/ keeps the pids directory itself in git.
 !/tmp/pids/
+
+# !/tmp/pids/.keep keeps the .keep placeholder so git tracks the directory.
 !/tmp/pids/.keep
 
 # Ignore storage (uploaded files in development and any SQLite databases).
+
+# /storage/* matches user-uploaded files and SQLite database files.
+# These are specific to your development environment and shouldn't be shared.
 /storage/*
+
+# !/storage/.keep ensures the storage directory is tracked by git.
 !/storage/.keep
+
+# /tmp/storage/* matches temporary storage files (like preview files for uploads).
 /tmp/storage/*
+
+# !/tmp/storage/ keeps the tmp/storage directory in git.
 !/tmp/storage/
+
+# !/tmp/storage/.keep keeps the placeholder so the directory is tracked.
 !/tmp/storage/.keep
 
+# /public/assets contains precompiled CSS and JavaScript files.
+# These are generated from source files and should be regenerated, not committed.
 /public/assets
 
 # Ignore key files for decrypting credentials and more.
-/config/*.key
 
+# /config/*.key matches any .key file in the config directory.
+# These keys decrypt Rails credentials (secrets). They must never be committed
+# for security — anyone with the key can read all your secrets.
+/config/*.key

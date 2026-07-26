@@ -1,18 +1,42 @@
+# This file configures Solid Queue, Rails' built-in background job processor.
+# Background jobs are tasks that run asynchronously (not during a web request),
+# like sending welcome emails or processing uploaded files.
+
+# `default: &default` creates a YAML anchor with shared settings for all environments.
 default: &default
+  # `dispatchers:` are processes that pull jobs from the database and hand them to workers.
   dispatchers:
-    - polling_interval: 1
+    # This list can have multiple dispatcher configs, but here there's just one:
+    - # `polling_interval: 1` means the dispatcher checks for new jobs every 1 second.
+      # Lower = faster job pickup but more database activity.
+      polling_interval: 1
+      # `batch_size: 500` means the dispatcher fetches up to 500 jobs at once from the database.
+      # Batching is more efficient than fetching one job at a time.
       batch_size: 500
+  # `workers:` are the processes that actually execute the jobs.
   workers:
-    - queues: "*"
+    # This list can have multiple worker configs, but here there's just one:
+    - # `queues: "*"` means this worker processes jobs from ALL queues.
+      # You could restrict it to specific queues like "mailers" or "default".
+      queues: "*"
+      # `threads: 3` means each worker process can run 3 jobs simultaneously.
+      # More threads = more parallelism, but uses more memory.
       threads: 3
+      # `processes:` sets how many separate worker processes to run.
+      # It reads from the JOB_CONCURRENCY environment variable, defaulting to 1.
+      # More processes = more parallelism (beyond what threads alone provide).
       processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      # `polling_interval: 0.1` means each worker checks for assigned jobs every 0.1 seconds.
       polling_interval: 0.1
 
+# `development:` inherits all default queue settings.
 development:
   <<: *default
 
+# `test:` inherits all default queue settings.
 test:
   <<: *default
 
+# `production:` inherits all default queue settings.
 production:
   <<: *default

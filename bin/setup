@@ -1,18 +1,42 @@
 #!/usr/bin/env ruby
+# The line above is a "shebang" — it tells your computer to run this file using
+# the Ruby interpreter found in your PATH (whatever Ruby version is active).
+# This makes the file executable from the terminal with `./bin/setup`.
+
+# "require" loads a Ruby library so we can use its methods.
+# "fileutils" gives us file system operations like copying files and changing directories.
 require "fileutils"
 
+# APP_ROOT stores the absolute path to the project's root directory (one level up from bin/).
+# File.expand_path("..", __dir__) resolves ".." relative to this file's directory,
+# which gives us the project root regardless of where we run the script from.
 APP_ROOT = File.expand_path("..", __dir__)
 
+# Define a helper method called "system!" that runs shell commands.
+# The *args syntax means it accepts any number of arguments (like "bundle install").
+# It wraps Ruby's built-in system() method, which runs a command in a subprocess.
 def system!(*args)
+  # system() runs the command and returns true/false for success/failure.
+  # exception: true makes it raise an error if the command fails instead of returning false.
+  # This ensures the setup script stops immediately if something goes wrong.
   system(*args, exception: true)
+# End of the system! method definition.
 end
 
+# Change the current working directory to the project root before running commands.
+# This ensures all commands run from the right location (the project folder).
 FileUtils.chdir APP_ROOT do
   # This script is a way to set up or update your development environment automatically.
   # This script is idempotent, so that you can run it at any time and get an expectable outcome.
   # Add necessary setup steps to this file.
 
+  # Print a status message so the developer knows what's happening.
   puts "== Installing dependencies =="
+
+  # "bundle check" sees if all gems (Ruby packages) are already installed.
+  # If it returns true (all installed), we skip "bundle install".
+  # If it returns false (some missing), we run "bundle install" to install them.
+  # The || operator means "or" — try the first command, and if it fails, run the second.
   system("bundle check") || system!("bundle install")
 
   # puts "\n== Copying sample files =="
@@ -20,16 +44,38 @@ FileUtils.chdir APP_ROOT do
   #   FileUtils.cp "config/database.yml.sample", "config/database.yml"
   # end
 
+  # Print a status message about database preparation.
   puts "\n== Preparing database =="
+
+  # "db:prepare" creates the database if it doesn't exist, then runs any pending migrations.
+  # This is safe to run multiple times — it won't duplicate anything.
   system! "bin/rails db:prepare"
+
+  # If the developer passed "--reset" as an argument (./bin/setup --reset),
+  # also run "db:reset" which drops and recreates the database from scratch.
+  # ARGV is an array of command-line arguments the user typed.
   system! "bin/rails db:reset" if ARGV.include?("--reset")
 
+  # Print a status message about cleaning up old files.
   puts "\n== Removing old logs and tempfiles =="
+  # Clear out old log files and temporary files to start fresh.
+  # "log:clear" deletes log/*.log files; "tmp:clear" deletes tmp/ cache and session files.
   system! "bin/rails log:clear tmp:clear"
 
+  # If the developer did NOT pass "--skip-server", start the development server.
+  # ARGV.include? checks if the "--skip-server" flag was provided.
   unless ARGV.include?("--skip-server")
+    # Print a status message about starting the server.
     puts "\n== Starting development server =="
-    STDOUT.flush # flush the output before exec(2) so that it displays
+
+    # Flush the output buffer so all puts messages appear before the server starts.
+    # Without this, the messages above might not show up on screen.
+    STDOUT.flush
+
+    # "exec" replaces the current process with a new one — it runs "bin/dev".
+    # bin/dev starts all development servers (Rails + CSS/JS watchers).
+    # After exec, this setup script is gone — your terminal is now running bin/dev.
     exec "bin/dev"
   end
+# End of the directory change block.
 end

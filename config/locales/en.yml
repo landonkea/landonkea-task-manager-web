@@ -27,5 +27,12 @@
 #       "yes": yup
 #       enabled: "ON"
 
+# `en:` is the top-level key for the English locale.
+# All English translations live under this key. If you added a Spanish file,
+# it would start with `es:` instead.
 en:
+  # `hello: "Hello world"` defines a translation key called "hello".
+  # You can reference it in your app with `t("hello")` or `I18n.t("hello")`,
+  # and it returns "Hello world". This is useful for translating your app into
+  # multiple languages without changing code -- just add new locale files.
   hello: "Hello world"
