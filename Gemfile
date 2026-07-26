@@ -103,7 +103,7 @@ gem "thruster", require: false
 
 # Image Processing provides tools to resize and transform uploaded images.
 # It's used by Active Storage when you create image "variants" (e.g., thumbnails).
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.0"
 
 # The "group" keyword limits gems to specific environments.
 # :development means "only load this gem when running locally."
