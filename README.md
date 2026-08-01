@@ -96,6 +96,38 @@ docker run -d \
   task_manager_web
 ```
 
+## Environments
+
+This app has three environments: `development` (your machine), `staging`, and
+`production`. Staging and production both deploy to the same LAN server
+(`192.168.0.1`) via Kamal, but as completely separate containers with their own
+image, volume, and SQLite database files -- they never share state.
+
+| Environment | Where it runs | Config | Database files |
+|-------------|----------------|--------|-----------------|
+| development | Your machine (`bin/dev`) | `config/environments/development.rb` | `storage/development.sqlite3` |
+| test        | Your machine (`bin/rails test`) | `config/environments/test.rb` | `storage/test.sqlite3` |
+| staging     | `192.168.0.1` via Kamal | `config/environments/staging.rb`, `config/deploy.staging.yml` | `storage/staging*.sqlite3` |
+| production  | `192.168.0.1` via Kamal | `config/environments/production.rb`, `config/deploy.yml` | `storage/production*.sqlite3` |
+
+Staging exists to let you deploy and poke at a real Kamal build before it goes to
+production, without touching production's data or containers. Deploy to it with:
+
+```sh
+bin/kamal deploy -d staging
+```
+
+Since staging shares the host's single kamal-proxy with production, it's reached by
+Host header rather than a separate domain (there's no public DNS for this LAN-only
+server):
+
+```sh
+curl -H "Host: task-manager-staging.lan" http://192.168.0.1/
+```
+
+Kamal commands accept `-d staging` to target the staging destination (e.g. `bin/kamal
+logs -d staging`, `bin/kamal console -d staging`). Omit `-d` to target production.
+
 ## API Usage
 
 All endpoints support both HTML and JSON responses.

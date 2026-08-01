@@ -83,3 +83,26 @@ production:
     database: storage/production_cable.sqlite3
     # Points to migrations that create tables needed for Action Cable's persistence.
     migrations_paths: db/cable_migrate
+
+# `staging:` mirrors the production multi-database setup exactly, but every file is
+# prefixed "staging_" instead of "production_" so the two environments never share a
+# SQLite file. Staging is deployed as its own Kamal service with its own storage volume
+# (see config/deploy.staging.yml), so this isolation also matches what's true at the
+# container/volume level -- staging and production can never accidentally read or
+# write each other's data even if they ran on the same host.
+staging:
+  primary:
+    <<: *default
+    database: storage/staging.sqlite3
+  cache:
+    <<: *default
+    database: storage/staging_cache.sqlite3
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *default
+    database: storage/staging_queue.sqlite3
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *default
+    database: storage/staging_cable.sqlite3
+    migrations_paths: db/cable_migrate

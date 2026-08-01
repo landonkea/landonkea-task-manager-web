@@ -128,9 +128,11 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
 
   # `config.action_mailer.default_url_options` sets the hostname for links in emails.
-  # In production, this should be your real domain name (like your-app.com).
-  # Currently set to "example.com" -- change this before going live!
-  config.action_mailer.default_url_options = { host: "example.com" }
+  # This app deploys to a LAN-only server (see config/deploy.yml), so there's no public
+  # domain name to hardcode -- "example.com" was a placeholder that would never actually
+  # resolve for a recipient. Default to the LAN server's IP, but allow it to be overridden
+  # via APP_HOST (set as a Kamal env var) if this ever moves behind a real domain.
+  config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "192.168.0.1") }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
   # config.action_mailer.smtp_settings = {
