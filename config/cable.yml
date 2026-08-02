@@ -20,6 +20,21 @@ test:
   # over WebSockets -- instead it lets you test your cable code by checking what was broadcast.
   adapter: test
 
+# `staging:` mirrors production's Action Cable setup exactly, so staging is
+# a faithful rehearsal of a real deploy — pointing at its own isolated
+# "cable" database connection (config/database.yml's separate staging:
+# cable: entry), not production's. Without this section, RAILS_ENV=staging
+# crashed at boot: config.eager_load loads Solid Cable's initializer, which
+# calls .connects_to on whatever this file returns for "staging" — nil,
+# if there's no section here at all.
+staging:
+  adapter: solid_cable
+  connects_to:
+    database:
+      writing: cable
+  polling_interval: 0.1.seconds
+  message_retention: 1.day
+
 # `production:` configures Action Cable for your live, real-users environment.
 production:
   # `adapter: solid_cable` uses Solid Cable, which stores WebSocket data in a database.
