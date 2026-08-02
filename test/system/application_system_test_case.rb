@@ -9,5 +9,5 @@ require "test_helper"
 # system test files are written. With this file present, the task runs
 # successfully and reports zero tests until real system tests are added.
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400]
+  driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 1400 ]
 end
