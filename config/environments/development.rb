@@ -168,4 +168,19 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
   # The commented-out line above would auto-format code created by Rails generators
   # using RuboCop (a Ruby style checker). Handy for keeping generated code consistent.
+
+  # Detect N+1 queries and unused eager loading with Bullet [https://github.com/flyerhzm/bullet]
+
+  # Bullet watches ActiveRecord queries during development and warns you when it spots
+  # an N+1 query or eager loading that wasn't actually used. This config follows Bullet's
+  # own recommended setup: log warnings to the Rails log and Bullet's own log file, pop up
+  # a browser alert, and print to the browser console for quick visibility while developing.
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.alert = true
+    Bullet.bullet_logger = true
+    Bullet.console = true
+    Bullet.rails_logger = true
+    Bullet.add_footer = true
+  end
 end

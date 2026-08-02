@@ -148,6 +148,13 @@ group :development do
   # web-console adds an interactive Ruby console to your error pages in development.
   # When your app crashes, you can type Ruby commands in the browser to debug.
   gem "web-console"
+
+  # Detect N+1 queries and unused eager loading [https://github.com/flyerhzm/bullet]
+
+  # Bullet watches your ActiveRecord queries as the app runs and warns you when it
+  # spots an N+1 query (querying associations one-by-one instead of eager loading)
+  # or eager loading that was never actually used. Development-only performance aid.
+  gem "bullet"
 end
 
 # Test-only gems — only loaded when running your test suite.
