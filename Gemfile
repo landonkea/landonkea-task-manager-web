@@ -105,6 +105,13 @@ gem "thruster", require: false
 # It's used by Active Storage when you create image "variants" (e.g., thumbnails).
 gem "image_processing", "~> 2.0"
 
+# As of image_processing 2.0, the vips/minimagick backends are no longer bundled
+# automatically -- the app must declare its processing backend explicitly. Rails'
+# default Active Storage variant_processor is :vips, and (as of Rails 8.1.3.1's Active
+# Storage CVE fix) the configured processor's gem is validated eagerly at boot, so a
+# missing backend now fails fast instead of only at first variant request.
+gem "ruby-vips", "~> 2.0"
+
 # The "group" keyword limits gems to specific environments.
 # :development means "only load this gem when running locally."
 # :test means "only load this gem when running tests."

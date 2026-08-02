@@ -1,0 +1,56 @@
+# This is a Kamal "destination" file for the STAGING environment.
+# Run it with `bin/kamal <command> -d staging` (e.g. `bin/kamal deploy -d staging`).
+# Kamal deep-merges this file over config/deploy.yml, so only the values that need to
+# differ from production are listed here -- everything else (builder arch, aliases,
+# asset_path, registry, etc.) is inherited from the base file.
+#
+# Staging deploys to the SAME LAN server as production (192.168.0.1) but as a
+# completely separate Kamal service/container, so the two never collide or share state.
+
+# A distinct service name means a distinct container, distinct default volume name,
+# and distinct entries in `docker ps` -- staging and production are never confused
+# for one another on the host.
+service: task_manager_web-staging
+
+# A distinct image name/tag namespace, built and pushed to the same local registry
+# as production but never overwriting the production image.
+image: task_manager_web-staging
+
+servers:
+  web:
+    - 192.168.0.1
+
+# Both production and staging share one kamal-proxy instance on the host (it listens
+# once on ports 80/443 total). Kamal routes between apps sharing that proxy by the
+# HTTP Host header, so staging needs its own `host` -- otherwise it would collide with
+# production's catch-all routing (production currently sets no host, so it accepts
+# any request that doesn't match another app's host).
+#
+# There's no real DNS for this LAN-only host name; reach staging with an explicit
+# Host header, e.g. `curl -H "Host: task-manager-staging.lan" http://192.168.0.1/`.
+# `ssl: false` because Let's Encrypt can't issue a certificate for a name that isn't
+# publicly resolvable.
+proxy:
+  host: task-manager-staging.lan
+  ssl: false
+
+registry:
+  server: localhost:5555
+
+env:
+  secret:
+    - RAILS_MASTER_KEY
+  clear:
+    # Tells Rails (and this app's config/environments/staging.rb) to boot in the
+    # staging environment instead of the production default. This is the one setting
+    # that actually switches which environment file and database.yml section load.
+    RAILS_ENV: staging
+    SOLID_QUEUE_IN_PUMA: true
+
+# A distinct volume name keeps staging's SQLite files (storage/staging*.sqlite3, per
+# config/database.yml) completely separate from production's persistent volume.
+volumes:
+  - "task_manager_web_staging_storage:/rails/storage"
+
+builder:
+  arch: amd64
