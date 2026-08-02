@@ -72,3 +72,4 @@
 # These keys decrypt Rails credentials (secrets). They must never be committed
 # for security — anyone with the key can read all your secrets.
 /config/*.key
+
