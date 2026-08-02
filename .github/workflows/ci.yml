@@ -52,6 +52,12 @@ jobs:
 # Runs on the latest Ubuntu runner.
 
     steps:
+      - name: Install packages
+# bin/importmap boots the full Rails app (via Bundler.require in config/application.rb),
+# which now eagerly requires ruby-vips -- so this job needs the native libvips library
+# on the runner too, same as the test jobs below, even though it never processes images.
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
+
       - name: Checkout code
 # Checks out the repo so JavaScript files and importmap configs are available.
         uses: actions/checkout@v7
