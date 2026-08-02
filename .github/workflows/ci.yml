@@ -95,7 +95,7 @@ jobs:
 
       - name: Prepare RuboCop cache
 # Restores a previously saved RuboCop analysis cache from GitHub's cache storage.
-        uses: actions/cache@v4
+        uses: actions/cache@v6
 # The GitHub Actions cache action, pinned to v4.
         env:
           DEPENDENCIES_HASH: ${{ hashFiles('.ruby-version', '**/.rubocop.yml', '**/.rubocop_todo.yml', 'Gemfile.lock') }}
