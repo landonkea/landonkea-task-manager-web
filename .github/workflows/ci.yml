@@ -164,6 +164,30 @@ jobs:
         run: bin/rails db:test:prepare test
 # db:test:prepare sets up/migrates the test database, then `test` runs Minitest.
 
+      - name: Generate persisted test report
+# Additive step: re-runs bin/rails test + bin/rubocop via the test_report rake
+# task (lib/tasks/test_report.rake) and writes a summary to
+# test-results/latest.md. continue-on-error keeps this step from failing the
+# job on its own -- the "Run tests" step above is still the source of truth
+# for pass/fail; this just persists a readable summary as a build artifact.
+        env:
+          RAILS_ENV: test
+        run: bin/rails test_report
+        continue-on-error: true
+
+      - name: Upload test report artifact
+# Publishes test-results/latest.md as a downloadable artifact on the workflow
+# run, so pass/fail counts, failing tests, and the RuboCop offense count are
+# available without re-running anything locally.
+        uses: actions/upload-artifact@v7
+        if: always()
+# Runs even if the report step above reported a failure, so the report is
+# still available for a red build.
+        with:
+          name: test-report
+          path: test-results/latest.md
+          if-no-files-found: warn
+
   system-test:
 # Job name: runs browser-based system tests (end-to-end with a real browser).
     runs-on: ubuntu-latest

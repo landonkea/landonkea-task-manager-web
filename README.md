@@ -71,6 +71,21 @@ bin/rails test
 bin/rubocop
 ```
 
+### Persisted Test Report
+
+`bin/rails test_report` runs `bin/rails test` and `bin/rubocop` and writes a
+summary (pass/fail counts, timestamp, failing tests, RuboCop offense count) to
+`test-results/latest.md`. The report is regenerated on every run and is
+gitignored -- it's a build artifact, not something to commit.
+
+```sh
+bin/rails test_report
+```
+
+The task exits non-zero if either check fails, so it can be used as a CI gate.
+CI runs it as an additive step and uploads `test-results/latest.md` as a
+downloadable build artifact (see `.github/workflows/ci.yml`).
+
 ### Security Scans
 
 ```sh
@@ -95,6 +110,23 @@ docker run -d \
   --name task_manager_web \
   task_manager_web
 ```
+
+### docker-compose (standalone local dev)
+
+`docker-compose.yml` builds the same Dockerfile Kamal deploys and runs it
+locally -- a quick way to run the app in a container without installing Ruby.
+The app is SQLite-based (see `config/database.yml`) with no separate database
+server, so there's just one `web` service; its `storage/` directory (SQLite
+files, Active Storage uploads) is bind-mounted so data survives rebuilds.
+
+```sh
+echo "RAILS_MASTER_KEY=$(cat config/master.key)" > .env
+docker compose up --build
+```
+
+The app is then available at `http://localhost:3000`. Note the image bakes in
+`RAILS_ENV=production`, so this runs against `storage/production.sqlite3`,
+mirroring a real Kamal deploy rather than `bin/dev`'s development environment.
 
 ## Environments
 
