@@ -17,22 +17,36 @@
 <%# This tells the user they are on the Tasks list page %>
 <h1>Tasks</h1>
 
+<%# This shows a quick "x of y tasks remaining" summary right under the heading, so the %>
+<%# user doesn't have to count checkmarks themselves to see how much is left to do. %>
+<%# @remaining_count and @total_count are set in TasksController#index. %>
+<p class="task-count-summary"><%= @remaining_count %> of <%= @total_count %> tasks remaining</p>
+
 <%# A <div> with id="tasks" wraps all task items - the id helps with CSS styling and JavaScript targeting %>
 <div id="tasks">
-  <%# @tasks is an instance variable set in the TasksController#index action %>
-  <%# It contains all Task records from the database %>
-  <%# .each iterates over every task, and |task| is a local variable holding the current task in each loop %>
-  <% @tasks.each do |task| %>
-    <%# render task looks for a partial file _task.html.erb and renders it once for each task %>
-    <%# This is Rails' convention: the _task.html.erb partial displays a single task's details %>
-    <%= render task %>
-    <%# This div wraps the navigation links for each individual task %>
-    <div class="task-links">
-      <%# link_to creates an HTML <a> tag (a clickable link) %>
-      <%# The first argument "Show this task" is the visible link text %>
-      <%# The second argument `task` is the URL - Rails automatically generates /tasks/:id from the task object %>
-      <%= link_to "Show this task", task %>
+  <%# When there are no tasks at all, show a friendly empty-state message instead of just an %>
+  <%# empty page - it's more welcoming and makes it obvious there's nothing broken here, %>
+  <%# there's just nothing to show yet. %>
+  <% if @tasks.empty? %>
+    <div class="empty-state">
+      <p>No tasks yet. Add your first one to get started!</p>
     </div>
+  <% else %>
+    <%# @tasks is an instance variable set in the TasksController#index action %>
+    <%# It contains all Task records from the database %>
+    <%# .each iterates over every task, and |task| is a local variable holding the current task in each loop %>
+    <% @tasks.each do |task| %>
+      <%# render task looks for a partial file _task.html.erb and renders it once for each task %>
+      <%# This is Rails' convention: the _task.html.erb partial displays a single task's details %>
+      <%= render task %>
+      <%# This div wraps the navigation links for each individual task %>
+      <div class="task-links">
+        <%# link_to creates an HTML <a> tag (a clickable link) %>
+        <%# The first argument "Show this task" is the visible link text %>
+        <%# The second argument `task` is the URL - Rails automatically generates /tasks/:id from the task object %>
+        <%= link_to "Show this task", task %>
+      </div>
+    <% end %>
   <% end %>
 </div>
 

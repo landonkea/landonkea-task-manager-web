@@ -22,6 +22,24 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # Tests that the index page shows the empty-state message when there are no tasks.
+  # We delete all tasks (including the fixtures loaded before this test) so the list
+  # is genuinely empty, then check the friendly empty-state copy renders.
+  test "should show empty state when there are no tasks" do
+    Task.delete_all
+    get tasks_url
+    assert_response :success
+    assert_select ".empty-state", text: /No tasks yet/
+  end
+
+  # Tests that the index page's "x of y tasks remaining" summary reflects the actual
+  # counts of pending vs. total tasks from the fixtures (one pending, one done).
+  test "should show remaining task count on index" do
+    get tasks_url
+    assert_response :success
+    assert_select ".task-count-summary", text: "1 of 2 tasks remaining"
+  end
+
   # Tests that visiting the "new task" form page works correctly.
   # This is the page where a user would type in a new task name and click submit.
   # A successful response means the form rendered without crashing.
