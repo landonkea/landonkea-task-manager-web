@@ -38,6 +38,16 @@
     <%= form.text_field :name, placeholder: "Enter task name..." %>
   </div>
 
+  <%# This div groups the "category" label and input together for styling with CSS %>
+  <div class="form-group">
+    <%# form.label :category creates a label that says "Category" %>
+    <%= form.label :category %>
+    <%# form.text_field :category creates a plain text input - it's a free-text field %>
+    <%# rather than a fixed dropdown, so any category name works, not just ones used %>
+    <%# before. The filter dropdown on the index page picks up whatever's typed here. %>
+    <%= form.text_field :category, placeholder: "e.g. Work, Home, Errands (optional)" %>
+  </div>
+
   <%# This div groups the "done" checkbox and its label together %>
   <div class="form-group">
     <%# form.label :done creates a label that says "Done" %>

@@ -10,29 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-# Tell Rails which version of the schema format we are using (8.1 in this case).
-# The define block opens a section where we describe all the tables in our database.
-# The version number comes from the timestamp of the last migration that ran.
-ActiveRecord::Schema[8.1].define(version: 2026_07_17_201431) do
-  # Create a new database table called "tasks".
-  # force: :cascade means if the table already exists, drop it first, then recreate it.
-  # The block |t| gives us a table object we use to define columns.
-  create_table "tasks", force: :cascade do |t|
-    # Add a "created_at" column that stores a date and time.
-    # null: false means every row MUST have a value here — it cannot be empty.
-    # This column tracks when each task was first created.
+ActiveRecord::Schema[8.1].define(version: 2026_08_03_082604) do
+  create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
-    # Add a "done" column that stores true or false (a boolean).
-    # This tracks whether a task has been completed or not.
-    # There is no null: false here, so it could technically be nil (unknown).
-    t.boolean "done"
-    # Add a "name" column that stores text strings (up to 255 characters by default).
-    # This is the human-readable title of the task, like "Buy groceries".
-    t.string "name"
-    # Add an "updated_at" column that stores a date and time.
-    # null: false means every row MUST have a value here.
-    # This column tracks the last time any change was made to the task.
+    t.string "ip_address"
     t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
   end
-# End of the schema definition block.
+
+  create_table "tasks", force: :cascade do |t|
+    t.string "category"
+    t.datetime "created_at", null: false
+    t.boolean "done"
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_tasks_on_category"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_address", null: false
+    t.string "password_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
+  add_foreign_key "sessions", "users"
 end

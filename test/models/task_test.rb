@@ -105,4 +105,70 @@ class TaskTest < ActiveSupport::TestCase
     assert_equal "Integration test", found.name
     assert_equal false, found.done
   end
+
+  # This test checks that an empty-string category is normalized to nil, so a task
+  # with no category is consistently nil rather than a mix of nil and "".
+  test "normalizes blank category to nil" do
+    task = Task.create!(name: "No category task", done: false, category: "  ")
+    assert_nil task.category
+  end
+
+  # This test checks that category, like name, gets stray whitespace trimmed off.
+  test "strips whitespace from category" do
+    task = Task.create!(name: "Task", done: false, category: "  Work  ")
+    assert_equal "Work", task.category
+  end
+
+  # This test checks that a category longer than 100 characters is rejected, mirroring
+  # the length cap on "name" so this column can't grow unbounded either.
+  test "rejects category longer than 100 characters" do
+    task = Task.new(name: "Task", done: false, category: "a" * 101)
+    assert_not task.valid?
+    assert_includes task.errors[:category], "is too long (maximum is 100 characters)"
+  end
+
+  # This test checks the "in_category" scope: given a category, it should return only
+  # tasks with that exact category, and given a blank value, it should return everything.
+  test "in_category scope filters by exact category" do
+    work = Task.create!(name: "Work task", done: false, category: "Work")
+    Task.create!(name: "Home task", done: false, category: "Home")
+
+    assert_equal [ work ], Task.in_category("Work").to_a
+    assert_equal 2, Task.in_category(nil).count
+    assert_equal 2, Task.in_category("").count
+  end
+
+  # This test checks the "search" scope: it should match tasks whose name OR category
+  # contains the query, case-insensitively, and leave everything in when the query is blank.
+  test "search scope matches name or category case-insensitively" do
+    groceries = Task.create!(name: "Buy Groceries", done: false)
+    Task.create!(name: "Walk the dog", done: false, category: "Home")
+    work_task = Task.create!(name: "Ship the report", done: false, category: "Work")
+
+    assert_equal [ groceries ], Task.search("groceries").to_a
+    assert_equal [ work_task ], Task.search("WORK").to_a
+    assert_equal 3, Task.search(nil).count
+    assert_equal 3, Task.search("").count
+  end
+
+  # This test checks that "%" and "_" in a search query are treated as literal characters,
+  # not SQL LIKE wildcards - otherwise searching for something like "50%" would match
+  # far more than intended.
+  test "search scope escapes LIKE wildcard characters" do
+    Task.create!(name: "Discount 50%", done: false)
+    Task.create!(name: "Totally unrelated", done: false)
+
+    assert_equal 1, Task.search("50%").count
+  end
+
+  # This test checks the "categories" scope: it should return every distinct, non-blank
+  # category in use, sorted alphabetically, without duplicates.
+  test "categories scope returns distinct sorted category names" do
+    Task.create!(name: "Task 1", done: false, category: "Work")
+    Task.create!(name: "Task 2", done: false, category: "Home")
+    Task.create!(name: "Task 3", done: false, category: "Work")
+    Task.create!(name: "Task 4", done: false)
+
+    assert_equal [ "Home", "Work" ], Task.categories
+  end
 end

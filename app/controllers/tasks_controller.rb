@@ -15,9 +15,17 @@ class TasksController < ApplicationController
   # This handles requests to view the full list of tasks.
   # When a user visits /tasks in their browser, this method runs.
   def index
-    # This grabs EVERY task from the database and stores them in @tasks.
-    # The "@" makes it an instance variable, which means it can be accessed in the view template.
-    @tasks = Task.all
+    # params[:q] holds whatever text was typed into the search box (name/category), and
+    # params[:category] holds whichever category was picked from the filter dropdown.
+    # Both are optional - "search" and "in_category" are model scopes that simply return
+    # every task when given a blank value, so this works the same whether or not the
+    # user is filtering at all.
+    @tasks = Task.all.search(params[:q]).in_category(params[:category])
+
+    # @categories powers the filter dropdown's list of options - every distinct category
+    # currently in use across ALL tasks (not just the filtered ones), so switching filters
+    # never makes other categories disappear from the dropdown.
+    @categories = Task.categories
   end
 
   # --- SHOW ACTION ---
@@ -122,10 +130,10 @@ class TasksController < ApplicationController
     end
 
     # This method defines which form fields are allowed to be saved to the database.
-    # It ONLY permits "name" and "done" — anything else in the form is ignored.
+    # It ONLY permits "name", "done", and "category" — anything else in the form is ignored.
     # This is a critical security feature that prevents hackers from injecting bad data.
     # Only allow a list of trusted parameters through.
     def task_params
-      params.expect(task: [ :name, :done ])
+      params.expect(task: [ :name, :done, :category ])
     end
 end

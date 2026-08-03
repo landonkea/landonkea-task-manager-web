@@ -4,6 +4,14 @@
 # `Rails.application.routes.draw do` starts the block where you define all your URLs.
 # Everything between `do` and `end` is a route definition.
 Rails.application.routes.draw do
+  # `resource :session` (singular) creates the login/logout URLs backed by SessionsController:
+  #   GET    /session/new -> show the sign-in form (new action)
+  #   POST   /session     -> sign in with email/password (create action)
+  #   DELETE /session     -> sign out (destroy action)
+  # There is deliberately no "resources :users" / signup route here - this is a minimal,
+  # single-user auth gate (see db/seeds.rb), not a full multi-user product with registration.
+  resource :session
+
   # `resources :tasks` automatically creates ALL the standard URLs for managing tasks:
   #   GET    /tasks        -> list all tasks        (index action)
   #   GET    /tasks/new    -> show a form for a new task (new action)
