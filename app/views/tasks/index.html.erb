@@ -43,3 +43,9 @@
   <%# This is where the user clicks to go to the form for creating a new task %>
   <%= link_to "New task", new_task_path, class: "btn btn-primary" %>
 </div>
+
+<%# Link to the recurring tasks feature - templates that automatically generate tasks %>
+<%# like this one on a repeating schedule, instead of needing to be created by hand each time %>
+<div class="nav-links">
+  <%= link_to "Manage recurring tasks", recurring_tasks_path %>
+</div>

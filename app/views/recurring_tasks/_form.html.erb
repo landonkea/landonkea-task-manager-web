@@ -1,0 +1,46 @@
+<%= form_with(model: recurring_task) do |form| %>
+  <% if recurring_task.errors.any? %>
+    <div class="error-messages">
+      <h2><%= pluralize(recurring_task.errors.count, "error") %> prohibited this recurring task from being saved:</h2>
+      <ul>
+        <% recurring_task.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= form.label :name %>
+    <%# This is the name every Task generated from this template will get %>
+    <%= form.text_field :name, placeholder: "e.g. Water the plants" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :interval_count, "Every" %>
+    <%# A plain number input for the "N" in "every N weeks" - min: 1 matches the model's %>
+    <%# validation that interval_count must be a positive whole number. %>
+    <%= form.number_field :interval_count, min: 1, step: 1 %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :interval_unit %>
+    <%# Builds a dropdown from the RecurringTask.interval_units enum (daily/weekly/monthly). %>
+    <%= form.select :interval_unit, RecurringTask.interval_units.keys.map { |key| [ key.capitalize, key ] } %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :next_run_on, "Next run on" %>
+    <%= form.date_field :next_run_on %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :active %>
+    <%= form.checkbox :active %>
+    Generate tasks on schedule (uncheck to pause without deleting)
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit class: "btn btn-primary" %>
+  </div>
+<% end %>

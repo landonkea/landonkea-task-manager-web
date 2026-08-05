@@ -27,3 +27,13 @@ production:
     # at the 12th minute of each hour (12:12, 1:12, 2:12, etc.).
     # Staggering the time avoids all jobs running at exactly :00.
     schedule: every hour at minute 12
+
+  # `generate_recurring_tasks:` sweeps every active RecurringTask template and spawns a
+  # fresh Task from each one that's due (see app/jobs/generate_recurring_tasks_job.rb).
+  generate_recurring_tasks:
+    # `class:` names the ActiveJob class Solid Queue should run on this schedule.
+    class: GenerateRecurringTasksJob
+    # `schedule: every 15 minutes` checks often enough that a template due "today" fires
+    # within 15 minutes of the day turning over, without hammering the database every
+    # few seconds - task generation isn't time-critical down to the minute.
+    schedule: every 15 minutes

@@ -1,0 +1,30 @@
+# Fixtures are pre-made fake data records that Rails loads into your test database.
+# Each fixture is identified by a label (like "weekly_chore") and maps to columns in
+# the recurring_tasks table.
+
+# An active weekly template that's already due (next_run_on is in the past), so tests
+# can verify it gets picked up by the "due_for_generation" scope and the generator job.
+weekly_chore:
+  name: "Water the plants"
+  interval_unit: 1 # weekly
+  interval_count: 1
+  next_run_on: <%= 1.day.ago.to_date %>
+  active: true
+
+# An active daily template that is NOT yet due (next_run_on is in the future), so tests
+# can verify it's correctly excluded from "due_for_generation".
+not_due_yet:
+  name: "Daily standup notes"
+  interval_unit: 0 # daily
+  interval_count: 1
+  next_run_on: <%= 3.days.from_now.to_date %>
+  active: true
+
+# A paused monthly template that's technically due, so tests can verify paused templates
+# are excluded from "due_for_generation" even when their date has arrived.
+paused_but_due:
+  name: "Pay rent"
+  interval_unit: 2 # monthly
+  interval_count: 1
+  next_run_on: <%= 1.day.ago.to_date %>
+  active: false

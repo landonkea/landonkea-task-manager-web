@@ -1,0 +1,37 @@
+<% if notice.present? %>
+  <p class="notice"><%= notice %></p>
+<% end %>
+
+<% content_for :title, "Recurring tasks" %>
+
+<h1>Recurring tasks</h1>
+
+<p class="task-count-summary">
+  <%# Template that generate tasks automatically - see GenerateRecurringTasksJob, which %>
+  <%# sweeps every active template every 15 minutes (config/recurring.yml). %>
+  These templates automatically create new tasks on a repeating schedule.
+</p>
+
+<% if @recurring_tasks.empty? %>
+  <div class="empty-state">
+    No recurring tasks yet. Create one to automatically generate tasks on a schedule,
+    like a weekly chore or a monthly reminder.
+  </div>
+<% else %>
+  <div id="recurring_tasks">
+    <% @recurring_tasks.each do |recurring_task| %>
+      <%= render recurring_task %>
+      <div class="task-links">
+        <%= link_to "Show this recurring task", recurring_task %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<div class="new-task-link">
+  <%= link_to "New recurring task", new_recurring_task_path, class: "btn btn-primary" %>
+</div>
+
+<div class="nav-links">
+  <%= link_to "Back to tasks", tasks_path %>
+</div>

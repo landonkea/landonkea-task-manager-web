@@ -1,0 +1,24 @@
+<%# dom_id generates a unique HTML id like "recurring_task_3" for this recurring task %>
+<div id="<%= dom_id recurring_task %>">
+  <%# Reuses the "task-card" styling from regular tasks so the two features look related %>
+  <div class="task-card">
+    <div class="task-name"><%= recurring_task.name %></div>
+
+    <%# Small badges summarizing the schedule: how often, and when it next fires %>
+    <div class="task-meta">
+      <span class="badge priority-low">
+        Every <%= recurring_task.interval_count %>
+        <%= recurring_task.interval_unit.singularize.pluralize(recurring_task.interval_count) %>
+      </span>
+      <span class="badge due-date">
+        Next: <%= recurring_task.next_run_on.to_fs(:long) %>
+      </span>
+    </div>
+
+    <%# Status line - reuses the "completed"/"pending" color convention: active is the
+        "good"/green state (like completed), paused is the neutral/yellow state (like pending) %>
+    <div class="task-status <%= recurring_task.active? ? "completed" : "pending" %>">
+      <%= recurring_task.active? ? "Active" : "Paused" %>
+    </div>
+  </div>
+</div>
