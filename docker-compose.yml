@@ -1,0 +1,42 @@
+# docker-compose.yml — standalone local development.
+#
+# This builds the same Dockerfile Kamal uses for staging/production (see
+# config/deploy.yml, config/deploy.staging.yml) and runs it locally with
+# `docker compose up --build`. It's meant as a quick way to run the app in a
+# container without installing Ruby locally, not as a replacement for `bin/dev`.
+#
+# The app uses SQLite (see config/database.yml) with no separate database
+# server, so there's no db/redis service here -- just the app container with
+# its storage/ directory (where the SQLite files and Active Storage uploads
+# live) bind-mounted so data survives `docker compose down` / rebuilds and is
+# inspectable from the host.
+#
+# The image bakes in RAILS_ENV=production (see Dockerfile), so this runs the
+# app in production mode against storage/production.sqlite3. That mirrors
+# what Kamal deploys, just on your machine.
+#
+# Usage:
+#   echo "RAILS_MASTER_KEY=$(cat config/master.key)" > .env
+#   docker compose up --build
+#   # App is then available at http://localhost:3000
+
+services:
+  web:
+    build: .
+    ports:
+      # Maps host port 3000 to the container's port 80 (see Dockerfile's
+      # EXPOSE 80 / Thruster), so the app is reachable the same way `bin/dev`
+      # would present it, at http://localhost:3000.
+      - "3000:80"
+    environment:
+      # RAILS_MASTER_KEY decrypts config/credentials.yml.enc. It's read from
+      # the shell environment or a .env file in this directory (Docker
+      # Compose loads .env automatically) rather than committed, since
+      # config/master.key is gitignored and never checked in.
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?Set RAILS_MASTER_KEY, e.g. echo "RAILS_MASTER_KEY=$(cat config/master.key)" > .env}
+    volumes:
+      # Bind-mounts the repo's storage/ directory into the container so the
+      # SQLite database files and any Active Storage uploads persist across
+      # `docker compose down` / image rebuilds and are visible on the host,
+      # same role as the named volume Kamal mounts in config/deploy.yml.
+      - ./storage:/rails/storage
