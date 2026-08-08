@@ -17,7 +17,16 @@ class TasksController < ApplicationController
   def index
     # This grabs EVERY task from the database and stores them in @tasks.
     # The "@" makes it an instance variable, which means it can be accessed in the view template.
-    @tasks = Task.all
+    # "order(created_at: :desc)" sorts them newest-first, so a freshly added task shows up
+    # at the top instead of the list order depending on whatever the database feels like today.
+    # ".to_a" runs the query right away and loads the results into a plain Ruby array.
+    # We do this (instead of leaving @tasks as a lazy relation) so the counts below and the
+    # view's @tasks.each loop reuse the same loaded rows instead of querying the database twice.
+    @tasks = Task.all.order(created_at: :desc).to_a
+
+    # These two counts power the "x of y tasks remaining" header on the index page.
+    @total_count = @tasks.size
+    @remaining_count = @tasks.count { |task| !task.done? }
   end
 
   # --- SHOW ACTION ---
@@ -122,10 +131,10 @@ class TasksController < ApplicationController
     end
 
     # This method defines which form fields are allowed to be saved to the database.
-    # It ONLY permits "name" and "done" — anything else in the form is ignored.
-    # This is a critical security feature that prevents hackers from injecting bad data.
-    # Only allow a list of trusted parameters through.
+    # It ONLY permits "name", "done", "due_on", "priority", and "notes" — anything else
+    # in the form is ignored. This is a critical security feature that prevents hackers
+    # from injecting bad data. Only allow a list of trusted parameters through.
     def task_params
-      params.expect(task: [ :name, :done ])
+      params.expect(task: [ :name, :done, :due_on, :priority, :notes ])
     end
 end

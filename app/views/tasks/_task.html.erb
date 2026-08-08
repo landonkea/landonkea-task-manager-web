@@ -8,6 +8,26 @@
     <%# This div displays the task's name, styled with the "task-name" CSS class %>
     <%# task.name reads the "name" attribute from the Task model/database record %>
     <div class="task-name"><%= task.name %></div>
+
+    <%# This div groups together the small badges that give extra at-a-glance info: %>
+    <%# the priority level, and (when present) the due date / overdue warning. %>
+    <div class="task-meta">
+      <%# task.priority returns the enum's string name ("low", "medium", or "high"). %>
+      <%# The CSS class "priority-#{task.priority}" lets each level get its own badge color. %>
+      <span class="badge priority-<%= task.priority %>"><%= task.priority.capitalize %></span>
+
+      <%# Only show a due date badge when the task actually has one - task.due_on is nil %>
+      <%# for tasks that were never given a due date, and there's nothing useful to show then. %>
+      <% if task.due_on.present? %>
+        <%# task.overdue? is the model method that checks: has a due date, that date has %>
+        <%# passed, and the task isn't done yet. Overdue tasks get the red "overdue" class. %>
+        <span class="badge due-date <%= "overdue" if task.overdue? %>">
+          <%# to_fs(:long) formats the date in a readable way, e.g. "August 03, 2026". %>
+          <%= task.overdue? ? "Overdue: " : "Due " %><%= task.due_on.to_fs(:long) %>
+        </span>
+      <% end %>
+    </div>
+
     <%# This div shows the task's status and gets different CSS classes based on completion %>
     <%# task.done? is a boolean method on the Task model that returns true or false %>
     <%# The ternary operator (?) checks: if done is true, use class "completed", otherwise "pending" %>
@@ -17,5 +37,11 @@
       <%# This is the text the user sees to know whether the task is finished or not %>
       <%= task.done? ? "Completed" : "Pending" %>
     </div>
+
+    <%# Notes are optional and can be long, so only render this block when there's something %>
+    <%# to show - an empty notes paragraph would just add clutter to every task card. %>
+    <% if task.notes.present? %>
+      <div class="task-notes"><%= task.notes %></div>
+    <% end %>
   </div>
 </div>

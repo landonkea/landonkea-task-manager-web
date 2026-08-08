@@ -159,6 +159,109 @@ h1 {
   color: #ffc107;
 }
 
+/* Style the row of small badges (priority, due date) shown under the task name */
+.task-meta {
+  /* Lay the badges out in a row, wrapping to a new line if there isn't room */
+  display: flex;
+  flex-wrap: wrap;
+
+  /* Add space between badges */
+  gap: 0.4rem;
+
+  /* Small space below the badges to separate them from the status line below */
+  margin-bottom: 0.4rem;
+}
+
+/* Base style shared by every small badge (priority levels, due date) */
+.badge {
+  /* Make badges inline-block so padding/border-radius apply correctly */
+  display: inline-block;
+
+  /* Small padding to give the badge a "pill" shape without taking much space */
+  padding: 0.15rem 0.55rem;
+
+  /* Fully rounded corners for a pill look */
+  border-radius: 999px;
+
+  /* Small text since this is secondary, at-a-glance information */
+  font-size: 0.75rem;
+
+  /* Medium weight so the badge text is legible at a small size */
+  font-weight: 600;
+}
+
+/* Priority badge colors - low priority is calm gray/blue, nothing urgent here */
+.badge.priority-low {
+  background-color: #e2e8f0;
+  color: #475569;
+}
+
+/* Medium priority - amber, worth noticing but not alarming */
+.badge.priority-medium {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* High priority - red, this one needs attention */
+.badge.priority-high {
+  background-color: #fde2e1;
+  color: #b42318;
+}
+
+/* Due date badge - neutral blue-gray by default (not overdue yet) */
+.badge.due-date {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+/* Overdue due date badge - red to clearly flag it needs attention now */
+.badge.due-date.overdue {
+  background-color: #fde2e1;
+  color: #b42318;
+}
+
+/* Style the optional free-text notes shown on a task card */
+.task-notes {
+  /* Small space above notes to separate them from the status line */
+  margin-top: 0.5rem;
+
+  /* Slightly smaller, muted text since notes are supplementary detail */
+  font-size: 0.9rem;
+  color: #57606a;
+
+  /* Preserve line breaks the user typed, and wrap long words instead of overflowing */
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Style the "x of y tasks remaining" summary line under the page heading */
+.task-count-summary {
+  /* Muted gray so it reads as secondary info, not a heading */
+  color: #6c757d;
+
+  /* Space below it to separate it from the task list */
+  margin-bottom: 1rem;
+}
+
+/* Style the friendly empty-state message shown when there are no tasks yet */
+.empty-state {
+  /* White card background matching the task cards for visual consistency */
+  background: #fff;
+
+  /* Dashed border to visually communicate "nothing here yet" rather than a solid card */
+  border: 1px dashed #d1d5da;
+  border-radius: 8px;
+
+  /* Generous padding so the message has room to breathe */
+  padding: 2rem 1.25rem;
+
+  /* Center the message text */
+  text-align: center;
+
+  /* Muted color since it's a placeholder message, not primary content */
+  color: #6c757d;
+}
+
 /* Style the container for task action links (Edit, Delete, etc.) */
 .task-links {
   /* Use flexbox layout to arrange links in a row */

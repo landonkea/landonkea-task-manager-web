@@ -49,6 +49,35 @@
     Mark as completed
   </div>
 
+  <%# This div groups the "due_on" label and date picker together %>
+  <div class="form-group">
+    <%# form.label :due_on creates a label that says "Due on" %>
+    <%= form.label :due_on, "Due on" %>
+    <%# form.date_field :due_on creates an <input type="date"> - the browser shows a native %>
+    <%# date picker, and the value is submitted as "YYYY-MM-DD", which Rails parses into a Date. %>
+    <%= form.date_field :due_on %>
+  </div>
+
+  <%# This div groups the "priority" label and dropdown together %>
+  <div class="form-group">
+    <%# form.label :priority creates a label that says "Priority" %>
+    <%= form.label :priority %>
+    <%# form.select :priority builds a dropdown from the Task.priorities enum (low/medium/high). %>
+    <%# Task.priorities.keys gives ["low", "medium", "high"]; .map(&:capitalize) makes them %>
+    <%# read nicely in the dropdown ("Low", "Medium", "High") while still submitting the %>
+    <%# lowercase enum key underneath, which is what the model expects. %>
+    <%= form.select :priority, Task.priorities.keys.map { |key| [ key.capitalize, key ] } %>
+  </div>
+
+  <%# This div groups the "notes" label and textarea together %>
+  <div class="form-group">
+    <%# form.label :notes creates a label that says "Notes" %>
+    <%= form.label :notes %>
+    <%# form.text_area :notes creates a multi-line <textarea> for longer free-form details %>
+    <%# that don't fit in the short "name" field - rows: 4 sets its visible height. %>
+    <%= form.text_area :notes, rows: 4, placeholder: "Add any extra details..." %>
+  </div>
+
   <%# This div wraps the submit button for layout/styling purposes %>
   <div class="form-actions">
     <%# form.submit creates a <button type="submit"> that sends the form data to the server %>

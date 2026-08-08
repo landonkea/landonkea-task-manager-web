@@ -105,4 +105,83 @@ class TaskTest < ActiveSupport::TestCase
     assert_equal "Integration test", found.name
     assert_equal false, found.done
   end
+
+  # This test checks that a new task defaults to "medium" priority when none is given.
+  # The database column has default: 1, which the "medium" enum value maps to.
+  test "defaults to medium priority" do
+    task = Task.create!(name: "Default priority task", done: false)
+    assert task.medium?
+  end
+
+  # This test checks that the priority enum accepts all three named levels and that
+  # each one round-trips correctly through the database.
+  test "accepts low, medium, and high priority" do
+    %w[low medium high].each do |level|
+      task = Task.create!(name: "#{level} task", done: false, priority: level)
+      assert_equal level, task.priority
+    end
+  end
+
+  # This test checks that assigning an unrecognized priority makes the task invalid.
+  # Because the enum was declared with "validate: true", Rails doesn't raise an
+  # ArgumentError for a bad value like it normally would - instead it stores the value
+  # and lets a regular inclusion validation catch it, which is friendlier for forms.
+  test "rejects an unknown priority" do
+    task = Task.new(name: "Bad priority task", done: false, priority: "urgent")
+    assert_not task.valid?
+    assert_includes task.errors[:priority], "is not included in the list"
+  end
+
+  # This test checks that notes longer than 5000 characters are rejected, mirroring
+  # the length cap we put on the "name" field so this text column can't grow unbounded.
+  test "rejects notes longer than 5000 characters" do
+    task = Task.new(name: "Long notes task", done: false, notes: "a" * 5001)
+    assert_not task.valid?
+    assert_includes task.errors[:notes], "is too long (maximum is 5000 characters)"
+  end
+
+  # This test checks that a blank notes field is perfectly valid - notes are optional,
+  # unlike the task name.
+  test "allows blank notes" do
+    task = Task.new(name: "No notes task", done: false, notes: "")
+    assert task.valid?
+  end
+
+  # This test checks the "overdue?" instance method: a pending task with a due date
+  # in the past should report itself as overdue.
+  test "overdue? is true for a pending task past its due date" do
+    task = Task.create!(name: "Late task", done: false, due_on: 1.day.ago.to_date)
+    assert task.overdue?
+  end
+
+  # This test checks that a task due in the future is NOT overdue, even though it
+  # has a due date set.
+  test "overdue? is false for a task due in the future" do
+    task = Task.create!(name: "Future task", done: false, due_on: 1.day.from_now.to_date)
+    assert_not task.overdue?
+  end
+
+  # This test checks that a completed task is never considered overdue, even if its
+  # due date has already passed - once it's done, the due date no longer matters.
+  test "overdue? is false for a done task past its due date" do
+    task = Task.create!(name: "Finished late task", done: true, due_on: 1.day.ago.to_date)
+    assert_not task.overdue?
+  end
+
+  # This test checks that a task with no due date at all is never overdue.
+  test "overdue? is false when there is no due date" do
+    task = Task.create!(name: "No due date task", done: false, due_on: nil)
+    assert_not task.overdue?
+  end
+
+  # This test checks the "overdue" scope: it should return only pending tasks whose
+  # due date has passed, excluding future-due tasks, done tasks, and tasks with no due date.
+  test "overdue scope returns only pending tasks past their due date" do
+    late = Task.create!(name: "Late task", done: false, due_on: 1.day.ago.to_date)
+    Task.create!(name: "Future task", done: false, due_on: 1.day.from_now.to_date)
+    Task.create!(name: "Finished late task", done: true, due_on: 1.day.ago.to_date)
+    Task.create!(name: "No due date task", done: false, due_on: nil)
+
+    assert_equal [ late ], Task.overdue.to_a
+  end
 end
