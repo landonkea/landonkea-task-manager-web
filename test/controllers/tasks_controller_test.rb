@@ -12,6 +12,12 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
   # Fixtures are pre-made test data so we don't have to create tasks from scratch each time.
   setup do
     @task = tasks(:one)
+    # The task index/show/create/etc. routes now sit behind the authentication gate
+    # (see app/controllers/concerns/authentication.rb, included in ApplicationController),
+    # so every request in this file needs a signed-in user first - sign_in_as is a test
+    # helper from test/test_helpers/session_test_helper.rb that fakes a valid session cookie
+    # without going through the actual sign-in form.
+    sign_in_as(users(:one))
   end
 
   # Tests that visiting the tasks list page (index) returns a successful HTTP response.
@@ -20,6 +26,41 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get tasks_url
     assert_response :success
+  end
+
+  # Tests that a signed-out visitor gets redirected to the sign-in page instead of
+  # seeing the task list - this is the whole point of the auth gate: the app shouldn't
+  # be wide open to anyone who finds the URL.
+  test "redirects signed-out visitor to sign in" do
+    sign_out
+    get tasks_url
+    assert_redirected_to new_session_path
+  end
+
+  # Tests that the search box (params[:q]) narrows the index down to matching tasks
+  # by name, and excludes tasks that don't match.
+  test "should filter index by search query" do
+    matching = Task.create!(name: "Buy stamps", done: false)
+    Task.create!(name: "Walk the dog", done: false)
+
+    get tasks_url, params: { q: "stamps" }
+
+    assert_response :success
+    assert_match matching.name, response.body
+    assert_no_match(/Walk the dog/, response.body)
+  end
+
+  # Tests that the category filter dropdown (params[:category]) narrows the index down
+  # to only tasks in that exact category.
+  test "should filter index by category" do
+    work_task = Task.create!(name: "Ship the report", done: false, category: "Work")
+    Task.create!(name: "Buy groceries again", done: false, category: "Home")
+
+    get tasks_url, params: { category: "Work" }
+
+    assert_response :success
+    assert_match work_task.name, response.body
+    assert_no_match(/Buy groceries again/, response.body)
   end
 
   # Tests that visiting the "new task" form page works correctly.

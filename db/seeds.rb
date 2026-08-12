@@ -3,6 +3,41 @@
 # Having sample data means you can see and test your app right away without
 # manually creating every record.
 
+# This app has a minimal SINGLE-USER auth gate (see app/models/user.rb and
+# config/routes.rb's `resource :session`) - there's no public signup form, so the one
+# account that's allowed to log in has to be created here instead.
+#
+# The email/password come from ENV variables rather than being hardcoded, so the same
+# seed file works in every environment without ever committing a real password to git:
+#   - In development, if you don't set them, we fall back to a well-known dev-only login
+#     so `bin/rails db:seed` "just works" locally.
+#   - In production/staging, ADMIN_EMAIL and ADMIN_PASSWORD should be set as Kamal secrets
+#     (see config/deploy.yml) - if they're missing there, we skip creating the user rather
+#     than silently seeding a guessable password into a real environment.
+admin_email = ENV["ADMIN_EMAIL"]
+admin_password = ENV["ADMIN_PASSWORD"]
+
+if admin_email.blank? || admin_password.blank?
+  if Rails.env.local?
+    admin_email = "admin@example.com"
+    admin_password = "password123"
+    puts "ADMIN_EMAIL/ADMIN_PASSWORD not set - using dev-only default (admin@example.com / password123)."
+  else
+    puts "ADMIN_EMAIL/ADMIN_PASSWORD not set - skipping user seed. Set both as Kamal secrets to create the login."
+  end
+end
+
+if admin_email.present? && admin_password.present?
+  # find_or_create_by! looks up the user by email first so re-running `db:seed` doesn't
+  # error out on a duplicate; update! then makes sure the password always matches ENV,
+  # in case ADMIN_PASSWORD was rotated.
+  user = User.find_or_create_by!(email_address: admin_email) do |u|
+    u.password = admin_password
+  end
+  user.update!(password: admin_password) unless user.authenticate(admin_password)
+  puts "Seeded login user: #{user.email_address}"
+end
+
 # Create an array (a list) of hashes (key-value pairs).
 # Each hash represents one task with a "name" (string) and "done" (boolean).
 # Two tasks start as "done: true" so you can see both completed and incomplete tasks.

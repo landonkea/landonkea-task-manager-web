@@ -8,6 +8,13 @@
     <%# This div displays the task's name, styled with the "task-name" CSS class %>
     <%# task.name reads the "name" attribute from the Task model/database record %>
     <div class="task-name"><%= task.name %></div>
+
+    <%# Only show a category badge when the task actually has one - task.category is nil %>
+    <%# for uncategorized tasks, and there's nothing useful to show then. %>
+    <% if task.category.present? %>
+      <span class="badge category"><%= task.category %></span>
+    <% end %>
+
     <%# This div shows the task's status and gets different CSS classes based on completion %>
     <%# task.done? is a boolean method on the Task model that returns true or false %>
     <%# The ternary operator (?) checks: if done is true, use class "completed", otherwise "pending" %>

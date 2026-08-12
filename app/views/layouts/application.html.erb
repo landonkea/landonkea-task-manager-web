@@ -62,6 +62,21 @@
 
   <%# <body> contains all the visible content of the page %>
   <body>
+    <%# "authenticated?" is a helper method from the Authentication concern (included in %>
+    <%# ApplicationController) that's true once someone has signed in. The sign-in page itself %>
+    <%# opts out of the authentication requirement, so this bar only shows once logged in - %>
+    <%# there's no point showing a "Sign out" link on the page whose whole job is signing in. %>
+    <% if authenticated? %>
+      <div class="session-bar">
+        <%# Current.session.user is set by resume_session/start_new_session_for in the %>
+        <%# Authentication concern - it's the signed-in user for this request. %>
+        <span>Signed in as <%= Current.session.user.email_address %></span>
+        <%# button_to renders a small form (not just a link) because signing out has to be a %>
+        <%# DELETE request, and browsers can't send DELETE from a plain <a> link. %>
+        <%= button_to "Sign out", session_path, method: :delete %>
+      </div>
+    <% end %>
+
     <%# yield inserts the content from each individual page template (like index.html.erb) %>
     <%# When you visit /tasks, Rails renders index.html.erb and inserts it here %>
     <%# This is how the layout wraps around every page - the layout provides the shell %>
