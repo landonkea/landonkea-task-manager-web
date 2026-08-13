@@ -4,6 +4,11 @@ require "test_helper"
 class RecurringTasksControllerTest < ActionDispatch::IntegrationTest
   setup do
     @recurring_task = recurring_tasks(:weekly_chore)
+    # This controller now sits behind the same authentication gate as
+    # TasksController (see app/controllers/concerns/authentication.rb),
+    # once feature/auth-categories-search merged, sign in a fake user
+    # first, matching TasksControllerTest's setup.
+    sign_in_as(users(:one))
   end
 
   test "should get index" do

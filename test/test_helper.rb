@@ -12,6 +12,7 @@ require_relative "../config/environment"
 # Load Rails' built-in test helpers, which provide useful methods like
 # assert, assert_equal, etc. These make writing tests much easier.
 require "rails/test_help"
+require_relative "test_helpers/session_test_helper"
 
 # Open the ActiveSupport module and define a base TestCase class inside it.
 # This is where you put setup code and helpers that ALL your tests will share.

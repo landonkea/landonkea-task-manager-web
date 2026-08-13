@@ -39,6 +39,34 @@ body {
   margin: 0 auto;
 }
 
+/* Style the small bar at the top of every authenticated page showing who's signed in
+   and a way to sign out. It sits above the page's own heading/content. */
+.session-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #d1d5da;
+  font-size: 0.9rem;
+  color: #57606a;
+}
+
+/* Style the search box and category filter row shown above the task list */
+.task-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Style the small badge showing a task's category, when it has one */
+.badge.category {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
 /* Style the main heading (h1) for page titles */
 h1 {
   /* Set a larger font size for the main heading */

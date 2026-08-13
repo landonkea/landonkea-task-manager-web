@@ -4,6 +4,7 @@
 # ApplicationController inherits from ActionController::Base, which provides all the core
 # Rails controller functionality — handling requests, rendering templates, redirects, etc.
 class ApplicationController < ActionController::Base
+  include Authentication
   # This line blocks old, outdated browsers from accessing your app.
   # "versions: :modern" means only modern browsers (that support features like webp images,
   # web push notifications, CSS nesting, etc.) are allowed in.

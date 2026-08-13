@@ -17,6 +17,36 @@
 <%# This tells the user they are on the Tasks list page %>
 <h1>Tasks</h1>
 
+<%# This form lets the user search by name/category and filter by an exact category, both %>
+<%# at once. It's a GET form (the default for form_with without :method) so search/filter %>
+<%# state lives in the URL query string - that means the filtered view is bookmarkable/ %>
+<%# shareable, and reloading the page doesn't lose the filter. %>
+<%= form_with url: tasks_path, method: :get, class: "task-filters" do |form| %>
+  <%# form.search_field renders an <input type="search">, which gets a native "clear" (x) %>
+  <%# button in most browsers - a nice free affordance for a search box. %>
+  <%# value: params[:q] re-fills the box with whatever was last searched, so the search %>
+  <%# term doesn't disappear after the page reloads with results. %>
+  <%= form.search_field :q, value: params[:q], placeholder: "Search tasks..." %>
+
+  <%# Only show the category dropdown when at least one category exists - with zero %>
+  <%# categories in use, a dropdown would just be a confusing "All categories" no-op. %>
+  <% if @categories.any? %>
+    <%# options_for_select builds <option> tags from @categories, and marks whichever one %>
+    <%# matches params[:category] as selected so the dropdown reflects the active filter. %>
+    <%# The blank "" option means "don't filter by category" / "All categories". %>
+    <%= form.select :category,
+          options_for_select([ [ "All categories", "" ] ] + @categories.map { |c| [ c, c ] }, params[:category]) %>
+  <% end %>
+
+  <%= form.submit "Filter", class: "btn btn-primary" %>
+
+  <%# Only show a "Clear" link when a filter is actually active - no point cluttering the %>
+  <%# bar with a clear button when there's nothing to clear. %>
+  <% if params[:q].present? || params[:category].present? %>
+    <%= link_to "Clear", tasks_path %>
+  <% end %>
+<% end %>
+
 <%# A <div> with id="tasks" wraps all task items - the id helps with CSS styling and JavaScript targeting %>
 <div id="tasks">
   <%# @tasks is an instance variable set in the TasksController#index action %>
