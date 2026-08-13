@@ -72,6 +72,12 @@ env:
     # `RAILS_MASTER_KEY` is the key used to decrypt Rails credentials (encrypted secrets).
     # Without it, your app can't access its secret configuration.
     - RAILS_MASTER_KEY
+    # `ADMIN_EMAIL` / `ADMIN_PASSWORD` seed the single-user login that db/seeds.rb
+    # creates (see app/models/user.rb). Without these, db:seed skips creating a login
+    # entirely rather than falling back to a guessable password. Read from your shell
+    # environment via .kamal/secrets - see .env.production.example.
+    - ADMIN_EMAIL
+    - ADMIN_PASSWORD
   # `clear:` lists non-secret environment variables that are safe to have in this file.
   clear:
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.

@@ -16,6 +16,11 @@
 # These files contain secrets (API keys, passwords) that should never be committed.
 /.env*
 
+# Except the *.example files - these hold only placeholder values and document which
+# variables each Kamal destination needs (see .env.dev.example, .env.staging.example,
+# .env.production.example). Safe to commit; the "!" prefix un-ignores them.
+!/.env*.example
+
 # Ignore all logfiles and tempfiles.
 
 # /log/* matches all files inside the log/ directory.

@@ -40,6 +40,11 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    # Seeded single-user login (see db/seeds.rb) - required so staging has its own real
+    # password instead of falling back to the dev-only local default. Read from your
+    # shell environment via .kamal/secrets - see .env.staging.example.
+    - ADMIN_EMAIL
+    - ADMIN_PASSWORD
   clear:
     # Tells Rails (and this app's config/environments/staging.rb) to boot in the
     # staging environment instead of the production default. This is the one setting

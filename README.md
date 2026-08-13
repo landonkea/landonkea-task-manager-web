@@ -98,35 +98,54 @@ docker run -d \
 
 ## Environments
 
-This app has three environments: `development` (your machine), `staging`, and
-`production`. Staging and production both deploy to the same LAN server
-(`192.168.0.1`) via Kamal, but as completely separate containers with their own
-image, volume, and SQLite database files -- they never share state.
+This app has five environments: `development` (your machine), `test` (your machine),
+and three deployed Kamal destinations that form a pipeline - `dev`, `staging`, and
+`production`, roughly in the order code passes through them. All three deployed
+destinations point at the same LAN server (`192.168.0.1`) via Kamal, but as completely
+separate containers with their own image, volume, and SQLite database files -- they
+never share state, and a bug in one can't touch the others' data.
 
 | Environment | Where it runs | Config | Database files |
 |-------------|----------------|--------|-----------------|
 | development | Your machine (`bin/dev`) | `config/environments/development.rb` | `storage/development.sqlite3` |
 | test        | Your machine (`bin/rails test`) | `config/environments/test.rb` | `storage/test.sqlite3` |
+| dev         | `192.168.0.1` via Kamal | `config/environments/dev.rb`, `config/deploy.dev.yml` | `storage/dev*.sqlite3` |
 | staging     | `192.168.0.1` via Kamal | `config/environments/staging.rb`, `config/deploy.staging.yml` | `storage/staging*.sqlite3` |
 | production  | `192.168.0.1` via Kamal | `config/environments/production.rb`, `config/deploy.yml` | `storage/production*.sqlite3` |
 
-Staging exists to let you deploy and poke at a real Kamal build before it goes to
-production, without touching production's data or containers. Deploy to it with:
+Note that "dev" (deployed, Docker-based, production-like) and "development" (your
+machine, `bin/dev`, live code reloading) are deliberately different things - see the
+comment at the top of `config/environments/dev.rb` if that's confusing.
+
+Dev and staging exist to let you deploy and poke at a real Kamal build before it goes
+to production, without touching production's data or containers - dev first, for
+active debugging of a freshly landed change (it shows full error pages), then staging,
+for a final check against something closer to production's own settings. Deploy to
+either with:
 
 ```sh
+bin/kamal deploy -d dev
 bin/kamal deploy -d staging
 ```
 
-Since staging shares the host's single kamal-proxy with production, it's reached by
+Both need `ADMIN_EMAIL` and `ADMIN_PASSWORD` set in your shell first (see
+`.env.dev.example` / `.env.staging.example` / `.env.production.example`), since
+`db/seeds.rb` reads them as Kamal secrets to create that destination's login.
+
+Since all three destinations share the host's single kamal-proxy, each is reached by
 Host header rather than a separate domain (there's no public DNS for this LAN-only
 server):
 
 ```sh
+curl -H "Host: task-manager-dev.lan" http://192.168.0.1/
 curl -H "Host: task-manager-staging.lan" http://192.168.0.1/
 ```
 
-Kamal commands accept `-d staging` to target the staging destination (e.g. `bin/kamal
-logs -d staging`, `bin/kamal console -d staging`). Omit `-d` to target production.
+Kamal commands accept `-d dev` or `-d staging` to target that destination (e.g.
+`bin/kamal logs -d dev`, `bin/kamal console -d staging`). Omit `-d` to target production.
+
+No server currently answers at `192.168.0.1` for any of these three destinations - the
+config above is real and ready to use, but nothing has actually been deployed yet.
 
 ## API Usage
 
