@@ -58,7 +58,7 @@ gem "jbuilder"
 
 # bcrypt provides secure password hashing. It's commented out because
 # this app doesn't use user authentication yet. Uncomment it when needed.
-gem "bcrypt", "~> 3.1.7"
+# gem "bcrypt", "~> 3.1.7"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 
