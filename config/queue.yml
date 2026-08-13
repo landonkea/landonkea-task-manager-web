@@ -37,6 +37,16 @@ development:
 test:
   <<: *default
 
+# `staging:` inherits all default queue settings. Listed explicitly (rather than left
+# out and relying on solid_queue's own fallback) so every deployed environment has the
+# same kind of dedicated entry here that config/cable.yml needed for staging to boot.
+staging:
+  <<: *default
+
+# `dev:` inherits all default queue settings, same reasoning as staging above.
+dev:
+  <<: *default
+
 # `production:` inherits all default queue settings.
 production:
   <<: *default

@@ -106,3 +106,24 @@ staging:
     <<: *default
     database: storage/staging_cable.sqlite3
     migrations_paths: db/cable_migrate
+
+# `dev:` is the same multi-database setup again, one step earlier in the pipeline than
+# staging: a deployed copy of the app, but running as its own Kamal service with its own
+# "dev_"-prefixed SQLite files (see config/deploy.dev.yml) so it can never collide with
+# staging or production data. Code usually reaches dev first, before staging, before prod.
+dev:
+  primary:
+    <<: *default
+    database: storage/dev.sqlite3
+  cache:
+    <<: *default
+    database: storage/dev_cache.sqlite3
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *default
+    database: storage/dev_queue.sqlite3
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *default
+    database: storage/dev_cable.sqlite3
+    migrations_paths: db/cable_migrate

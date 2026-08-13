@@ -1,0 +1,64 @@
+# This is a Kamal "destination" file for the DEV environment.
+# Run it with `bin/kamal <command> -d dev` (e.g. `bin/kamal deploy -d dev`).
+# Kamal deep-merges this file over config/deploy.yml, so only the values that need to
+# differ from production are listed here -- everything else (builder arch, aliases,
+# asset_path, registry, etc.) is inherited from the base file.
+#
+# Dev is the earliest stop in the pipeline: deploy here first, then staging, then
+# production, once each build has been checked out at the previous stage. Like staging,
+# it deploys to the SAME LAN server as production (192.168.0.1) but as a completely
+# separate Kamal service/container, so none of the three ever collide or share state.
+#
+# No server currently answers at this address for a "dev" host header - this file makes
+# the destination real and ready to use the moment one does. Don't run `bin/kamal deploy
+# -d dev` against it until then.
+
+# A distinct service name means a distinct container, distinct default volume name,
+# and distinct entries in `docker ps` -- dev is never confused with staging or production
+# on the host.
+service: task_manager_web-dev
+
+# A distinct image name/tag namespace, built and pushed to the same local registry as
+# staging and production but never overwriting either of their images.
+image: task_manager_web-dev
+
+servers:
+  web:
+    - 192.168.0.1
+
+# All three destinations share one kamal-proxy instance on the host, so dev needs its
+# own `host` to avoid colliding with staging's or production's routing.
+#
+# There's no real DNS for this LAN-only host name; reach dev with an explicit Host
+# header, e.g. `curl -H "Host: task-manager-dev.lan" http://192.168.0.1/`.
+# `ssl: false` because Let's Encrypt can't issue a certificate for a name that isn't
+# publicly resolvable.
+proxy:
+  host: task-manager-dev.lan
+  ssl: false
+
+registry:
+  server: localhost:5555
+
+env:
+  secret:
+    - RAILS_MASTER_KEY
+    # Seeded single-user login (see db/seeds.rb) - required so dev has its own real
+    # password instead of falling back to the dev-only local default. Read from your
+    # shell environment via .kamal/secrets - see .env.dev.example.
+    - ADMIN_EMAIL
+    - ADMIN_PASSWORD
+  clear:
+    # Tells Rails (and config/environments/dev.rb) to boot in the dev environment
+    # instead of the production default. This is the setting that actually switches
+    # which environment file and database.yml section load.
+    RAILS_ENV: dev
+    SOLID_QUEUE_IN_PUMA: true
+
+# A distinct volume name keeps dev's SQLite files (storage/dev*.sqlite3, per
+# config/database.yml) completely separate from staging's and production's volumes.
+volumes:
+  - "task_manager_web_dev_storage:/rails/storage"
+
+builder:
+  arch: amd64

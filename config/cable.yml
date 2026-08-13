@@ -35,6 +35,17 @@ staging:
   polling_interval: 0.1.seconds
   message_retention: 1.day
 
+# `dev:` is the deployed dev destination (see config/deploy.dev.yml). It needs this
+# section for the same reason staging did above: without it, RAILS_ENV=dev would crash
+# at boot the moment eager loading reaches Solid Cable's initializer.
+dev:
+  adapter: solid_cable
+  connects_to:
+    database:
+      writing: cable
+  polling_interval: 0.1.seconds
+  message_retention: 1.day
+
 # `production:` configures Action Cable for your live, real-users environment.
 production:
   # `adapter: solid_cable` uses Solid Cable, which stores WebSocket data in a database.
