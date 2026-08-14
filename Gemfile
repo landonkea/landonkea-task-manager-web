@@ -56,9 +56,9 @@ gem "jbuilder"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 
-# bcrypt provides secure password hashing. It's commented out because
-# this app doesn't use user authentication yet. Uncomment it when needed.
-# gem "bcrypt", "~> 3.1.7"
+# bcrypt provides secure password hashing, needed by has_secure_password
+# for the admin auth gate.
+gem "bcrypt", "~> 3.1.7"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 
