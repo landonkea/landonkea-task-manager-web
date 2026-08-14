@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_03_082604) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_03_211845) do
+  create_table "recurring_tasks", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.integer "interval_count", default: 1, null: false
+    t.integer "interval_unit", default: 1, null: false
+    t.string "name", null: false
+    t.date "next_run_on", null: false
+    t.datetime "updated_at", null: false
+    t.index ["next_run_on"], name: "index_recurring_tasks_on_next_run_on"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -25,8 +36,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_03_082604) do
     t.datetime "created_at", null: false
     t.boolean "done"
     t.string "name"
+    t.integer "recurring_task_id"
     t.datetime "updated_at", null: false
     t.index ["category"], name: "index_tasks_on_category"
+    t.index ["recurring_task_id"], name: "index_tasks_on_recurring_task_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -38,4 +51,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_03_082604) do
   end
 
   add_foreign_key "sessions", "users"
+  add_foreign_key "tasks", "recurring_tasks"
 end

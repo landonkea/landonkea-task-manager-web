@@ -1,0 +1,9 @@
+<% content_for :title, "New recurring task" %>
+
+<h1>New recurring task</h1>
+
+<%= render "form", recurring_task: @recurring_task %>
+
+<div class="nav-links">
+  <%= link_to "Back to recurring tasks", recurring_tasks_path %>
+</div>

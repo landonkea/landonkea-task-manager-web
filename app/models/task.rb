@@ -4,6 +4,12 @@
 # The Task class inherits from ApplicationRecord, which gives it superpowers like
 # saving to the database, querying data, and more — all for free.
 class Task < ApplicationRecord
+  # Optional link back to the RecurringTask template that generated this task, if any.
+  # "optional: true" means a task does NOT need a recurring_task - most tasks are created
+  # by hand and this stays nil for them. See app/models/recurring_task.rb for the other
+  # side of this relationship.
+  belongs_to :recurring_task, optional: true
+
   # This line makes sure a task CANNOT be saved without a name.
   # The "presence: true" rule means the name field must not be blank.
   # The "length" rule means the name must be at least 1 character and at most 255 characters.
